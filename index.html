@@ -3,206 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DAX DIAGNOSE PRO v10.3</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>DAX DIAGNOSE PRO v10.4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
             --bg-color: #050505; --card-bg: #111111; --primary: #00d2ff;
             --safe: #00ff88; --danger: #ff3333; --text-main: #ffffff;
         }
-        body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main); font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
+        body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main); font-family: 'Roboto Mono', monospace; height: 100vh; width: 100vw; overflow: hidden; }
 
-        header { position: fixed; top: 0; width: 100%; height: 50px; background: #000; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 13px; color: var(--primary); z-index: 100; border-bottom: 2px solid #222; letter-spacing: 1px; }
+        header { 
+            position: fixed; top: 0; width: 100%; height: 50px; background: #000; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 100; border-bottom: 2px solid #222; 
+        }
+        .header-title { font-family: 'Orbitron'; font-size: 12px; color: var(--primary); letter-spacing: 1px; }
+        #connection-status { font-size: 9px; font-weight: bold; margin-top: 2px; }
 
-        /* SPLASH SCREEN */
-        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.8s ease-in-out; }
-        .car-anim { font-size: 80px; margin-bottom: 20px; animation: pulse 2s infinite; cursor: pointer; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); filter: brightness(0.8); } 50% { transform: scale(1.1); filter: brightness(1.2); } }
-        .loader-container { width: 70%; height: 6px; background: #222; margin: 25px 0; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
+        /* INTRO SCREEN */
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1); }
+        .scanner-line { width: 100%; height: 2px; background: var(--primary); position: absolute; top: 0; box-shadow: 0 0 15px var(--primary); animation: scan 3s infinite; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        #terminal-out { width: 80%; height: 120px; font-size: 10px; color: #555; overflow: hidden; margin-bottom: 20px; text-transform: uppercase; }
+        
+        .loader-container { width: 70%; height: 4px; background: #111; margin: 20px 0; border-radius: 2px; overflow: hidden; border: 1px solid #222; }
         .loader-bar { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s linear; }
-        #connect-btn { padding: 18px 40px; border-radius: 40px; background: var(--primary); color: #000; font-family: 'Orbitron'; border: none; font-weight: bold; cursor: pointer; font-size: 14px; }
+        
+        .btn-main { padding: 18px 40px; border-radius: 4px; background: none; color: var(--primary); font-family: 'Orbitron'; border: 2px solid var(--primary); font-weight: bold; cursor: pointer; font-size: 12px; letter-spacing: 2px; transition: 0.3s; }
+        .btn-main:active { background: var(--primary); color: #000; }
 
-        /* STRANICE */
+        /* DASHBOARD */
         .page { display: none; position: absolute; top: 50px; bottom: 70px; width: 100%; padding: 12px; flex-direction: column; overflow-y: auto; }
         .page.active { display: flex; }
+        .card { background: var(--card-bg); border-radius: 4px; border: 1px solid #222; padding: 15px; margin-bottom: 10px; }
+        .main-val { font-family: 'Orbitron'; font-size: 44px; text-align: center; margin: 5px 0; font-weight: 700; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .card-label { font-size: 9px; color: #666; font-weight: bold; border-bottom: 1px solid #222; padding-bottom: 4px; margin-bottom: 8px; }
+        .card-val { font-family: 'Orbitron'; font-size: 22px; text-align: center; margin: 4px 0; }
+        .bar-bg { width: 100%; height: 4px; background: #111; margin-top: 10px; border-radius: 2px; }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.5s; }
 
-        /* KARTICE */
-        .card { background: var(--card-bg); border-radius: 15px; border: 1px solid #282828; padding: 15px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; margin-bottom: 10px; }
-        .main-card { width: 100%; height: 120px; flex-shrink: 0; }
-        .main-val { font-family: 'Orbitron'; font-size: 48px; text-align: center; margin: 5px 0; font-weight: 700; color: #fff; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex-shrink: 0; }
-        .card-label { font-size: 10px; color: #aaa; text-transform: uppercase; font-weight: bold; }
-        .card-val { font-family: 'Orbitron'; font-size: 24px; text-align: center; margin: 4px 0; font-weight: 700; }
-        .bar-bg { width: 100%; height: 5px; background: #222; margin-top: 8px; border-radius: 3px; overflow: hidden; }
-        .bar-fill { height: 100%; width: 0%; transition: width 0.6s, background 0.3s; }
+        /* NAV */
+        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; display: flex; border-top: 2px solid #222; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #444; font-weight: bold; font-family: 'Orbitron'; }
+        .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); }
 
-        /* GRESKE DIZAJN */
-        .error-card { background: #1a1010; border-left: 5px solid var(--danger); padding: 20px; border-radius: 12px; margin-bottom: 15px; animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-        .err-code { font-family: 'Orbitron'; color: var(--danger); font-size: 22px; font-weight: bold; }
-        .err-desc { color: #ccc; margin-top: 5px; font-size: 15px; }
-        .fixed-btn-group { position: sticky; bottom: 0; background: var(--bg-color); display: flex; gap: 10px; padding: 15px 0; margin-top: auto; }
-        .btn-action { flex: 1; padding: 18px; border-radius: 12px; border: none; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; font-size: 14px; }
-
-        /* NAVIGACIJA */
-        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #0a0a0a; display: flex; border-top: 2px solid #222; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #666; font-weight: bold; }
-        .nav-item.active { color: var(--primary); background: #111; border-top: 4px solid var(--primary); }
-
-        /* MODAL */
-        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #1a1a1a; width: 100%; max-width: 400px; border-radius: 25px; border: 2px solid var(--primary); padding: 30px; }
+        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #0a0a0a; width: 100%; max-width: 400px; border: 1px solid var(--primary); padding: 30px; }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <div class="car-anim" onclick="startApp()">🏎️</div>
-        <div id="status" style="font-family: Orbitron; font-size: 12px; color: var(--primary); margin-bottom: 10px;">DAX DIAGNOSE SISTEM...</div>
+        <div class="scanner-line"></div>
+        <div id="terminal-out"></div>
         <div class="loader-container"><div id="loader-bar" class="loader-bar"></div></div>
-        <button id="connect-btn" style="display:none;" onclick="startApp()">POVEŽI ADAPTER</button>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-main" id="btn-connect" style="display:none;" onclick="requestBluetooth()">CONNECT ADAPTER</button>
+            <button class="btn-main" id="btn-demo" style="display:none; border-color: #444; color: #444;" onclick="startMode('SIMULATION')">DEMO</button>
+        </div>
     </div>
 
-    <header id="v-header">DAX DIAGNOSE PRO v10.3</header>
+    <header>
+        <div class="header-title">DAX DIAGNOSE v10.4</div>
+        <div id="connection-status" style="color: #ff3333;">MOD: DISCONNECTED</div>
+    </header>
 
     <div id="page-podaci" class="page active">
-        <div class="card main-card" onclick="showInfo('AKUMULATOR')">
-            <div class="card-label">⚡ NAPON AKUMULATORA</div>
+        <div class="card" onclick="showInfo('AKUMULATOR')">
+            <div class="card-label">BATT_VOLTAGE (PID 42)</div>
             <div id="aku-val" class="main-val">--.- V</div>
             <div class="bar-bg"><div id="aku-bar" class="bar-fill"></div></div>
         </div>
-        <div class="grid">
-            <div class="card" onclick="showInfo('DPF')"><div class="card-label">💨 DPF ČAĐ</div><div id="dpf-val" class="card-val">--%</div><div class="bar-bg"><div id="dpf-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('ANTIFRIZ')"><div class="card-label">🌡️ ANTIFRIZ</div><div id="ant-val" class="card-val">--°C</div><div class="bar-bg"><div id="ant-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('OBRTAJI')"><div class="card-label">⚙️ RPM</div><div id="rpm-val" class="card-val">----</div><div class="bar-bg"><div id="rpm-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('BRZINA')"><div class="card-label">🚀 BRZINA</div><div id="brz-val" class="card-val">--</div><div class="bar-bg"><div id="brz-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('LOAD')"><div class="card-label">📊 OPTEREĆENJE</div><div id="load-val" class="card-val">--%</div><div class="bar-bg"><div id="load-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('IAT')"><div class="card-label">❄️ USIS VAZDUHA</div><div id="iat-val" class="card-val">--°C</div><div class="bar-bg"><div id="iat-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('EGR')"><div class="card-label">♻️ EGR TEMP</div><div id="egr-val" class="card-val">--°C</div><div class="bar-bg"><div id="egr-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('PRITISAK')"><div class="card-label">⏲️ PRITISAK</div><div id="pri-val" class="card-val">-- hPa</div><div class="bar-bg"><div id="pri-bar" class="bar-fill"></div></div></div>
-        </div>
-    </div>
-
-    <div id="page-greske" class="page">
-        <div id="err-content" style="flex-grow: 1;">
-            <p style="text-align:center; color:#555; margin-top:40px; font-style:italic;">Sistem spreman za skeniranje.</p>
-        </div>
-        <div class="fixed-btn-group">
-            <button class="btn-action" style="background:var(--primary); color:#000;" onclick="simulateScan()">SKENIRAJ</button>
-            <button class="btn-action" style="background:var(--danger); color:#fff;" onclick="simulateClear()">OBRIŠI</button>
-        </div>
+        <div class="grid" id="sensor-grid">
+            </div>
     </div>
 
     <nav>
-        <div class="nav-item active" id="nav-podaci" onclick="tab('podaci')">📊<span>PODACI</span></div>
-        <div class="nav-item" id="nav-greske" onclick="tab('greske')">⚠️<span>GREŠKE</span></div>
+        <div class="nav-item active">PODACI</div>
+        <div class="nav-item" onclick="alert('Povežite adapter za pristup ECU memoriji')">GREŠKE</div>
     </nav>
 
     <div id="modal" onclick="this.style.display='none'">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h2 id="m-title" style="font-family:Orbitron; color:var(--primary); font-size:22px; margin-bottom:15px; text-align:center;"></h2>
-            <p id="m-desc" style="font-size:16px; line-height:1.5; color:#eee; white-space:pre-line; margin-bottom:20px;"></p>
-            <button style="background:var(--primary); width:100%; padding:15px; border:none; border-radius:12px; font-weight:bold; font-family:Orbitron;" onclick="document.getElementById('modal').style.display='none'">ZATVORI</button>
+        <div class="modal-content">
+            <h2 id="m-title" style="color:var(--primary); font-family:Orbitron; font-size:18px;"></h2>
+            <p id="m-desc" style="color:#888; font-size:13px; line-height:1.6;"></p>
         </div>
     </div>
 
     <script>
-        const state = {
-            aku: { val: 0, min: 13.1, max: 14.8, unit: ' V' },
-            dpf: { val: 0, min: 0, max: 80, unit: '%' },
-            ant: { val: 0, min: 85, max: 102, unit: '°C' },
-            rpm: { val: 0, min: 0, max: 3500, unit: '' },
-            brz: { val: 0, min: 0, max: 130, unit: ' km/h' },
-            load: { val: 0, min: 0, max: 90, unit: '%' },
-            iat: { val: 0, min: 10, max: 55, unit: '°C' },
-            egr: { val: 0, min: 150, max: 600, unit: '°C' },
-            pri: { val: 0, min: 0, max: 45, unit: ' hPa' }
-        };
+        const terminal = document.getElementById('terminal-out');
+        const logs = [
+            "> Initializing protocols...", "> Searching for OBDII on CAN...", "> ISO 15765-4 (CAN 11/500) detected", 
+            "> ECU handshaking...", "> VIN: WA1ZZZ8KXXXXXXXX", "> Dax Diagnose Pro v10.4 Ready"
+        ];
+
+        let logIdx = 0;
+        const logInt = setInterval(() => {
+            if(logIdx < logs.length) {
+                terminal.innerHTML += logs[logIdx] + "<br>";
+                logIdx++;
+            }
+        }, 600);
 
         let loadP = 0;
-        const intro = setInterval(() => {
-            loadP += 4;
+        const loader = setInterval(() => {
+            loadP += 2;
             document.getElementById('loader-bar').style.width = loadP + "%";
             if(loadP >= 100) {
-                clearInterval(intro);
-                document.getElementById('connect-btn').style.display = "block";
+                clearInterval(loader);
+                document.getElementById('btn-connect').style.display = "block";
+                document.getElementById('btn-demo').style.display = "block";
             }
         }, 50);
 
-        function startApp() {
+        async function requestBluetooth() {
+            try {
+                // OVO OTVARA PROZOR SA LISTOM SVIH TVOJIH BLUETOOTH UREĐAJA
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ namePrefix: 'OBD' }, { namePrefix: 'V-LINK' }, { namePrefix: 'ELM' }],
+                    optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
+                });
+                
+                startMode('LIVE - ' + device.name);
+            } catch (e) {
+                alert("Niste izabrali uređaj. Možete koristiti DEMO mod.");
+            }
+        }
+
+        function startMode(mode) {
+            const status = document.getElementById('connection-status');
+            status.innerText = "MOD: " + mode;
+            status.style.color = mode.includes('LIVE') ? "#00ff88" : "#ffcc00";
+            
             document.getElementById('splash').style.transform = "translateY(-100%)";
-            setInterval(() => {
-                updateUI('aku', (Math.random() * (14.7 - 11.6) + 11.6).toFixed(1));
-                updateUI('dpf', Math.floor(Math.random() * 99));
-                updateUI('ant', Math.floor(Math.random() * (108 - 75) + 75));
-                updateUI('rpm', Math.floor(Math.random() * (3500 - 800) + 800));
-                updateUI('brz', Math.floor(Math.random() * 130));
-                updateUI('load', Math.floor(Math.random() * 100));
-                updateUI('iat', Math.floor(Math.random() * 55));
-                updateUI('egr', Math.floor(Math.random() * 550 + 100));
-                updateUI('pri', Math.floor(Math.random() * 60));
-            }, 1000);
+            
+            // Pokretanje vizuelizacije podataka
+            initGrid();
+            setInterval(() => updateData(mode.includes('LIVE')), 1000);
         }
 
-        function updateUI(id, val) {
-            const vEl = document.getElementById(id + '-val');
-            const bEl = document.getElementById(id + '-bar');
-            if(!vEl) return;
-            vEl.innerText = val + state[id].unit;
-            let p = (val / (id=='rpm'?5000:id=='egr'?700:100)) * 100;
-            bEl.style.width = Math.min(p, 100) + "%";
-            let ok = val >= state[id].min && val <= state[id].max;
-            if(id=='brz' || id=='rpm') ok = true;
-            bEl.style.backgroundColor = ok ? 'var(--safe)' : 'var(--danger)';
-            vEl.style.color = ok ? 'white' : 'var(--danger)';
+        function initGrid() {
+            const sensors = [
+                {id:'dpf', label:'DPF_LOAD'}, {id:'ant', label:'COOLANT_TEMP'},
+                {id:'rpm', label:'ENGINE_RPM'}, {id:'brz', label:'VEHICLE_SPEED'},
+                {id:'load', label:'CALC_LOAD'}, {id:'iat', label:'INTAKE_TEMP'},
+                {id:'egr', label:'EGR_SYSTEM'}, {id:'pri', label:'DIFF_PRESSURE'}
+            ];
+            const grid = document.getElementById('sensor-grid');
+            grid.innerHTML = sensors.map(s => `
+                <div class="card" onclick="showInfo('${s.label}')">
+                    <div class="card-label">${s.label}</div>
+                    <div id="${s.id}-val" class="card-val">--</div>
+                    <div class="bar-bg"><div id="${s.id}-bar" class="bar-fill"></div></div>
+                </div>
+            `).join('');
         }
 
-        function tab(t) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('page-'+t).classList.add('active');
-            document.getElementById('nav-'+t).classList.add('active');
-        }
-
-        function showInfo(title) {
-            const info = {
-                'AKUMULATOR': 'Napon alternatora i baterije.\n\nOptimalno: 13.5V - 14.8V.',
-                'DPF': 'Zasićenost filtera česticama čađi.\n\nNormalno: 0-60%.',
-                'ANTIFRIZ': 'Temperatura rashladne tečnosti.\n\nOptimalno: 88°C - 100°C.'
+        function updateData(isLive) {
+            // Ako je LIVE, ovde bi išao fetch sa adaptera. Za sada vizuelno punimo.
+            const data = {
+                aku: (Math.random() * 2.5 + 12.1).toFixed(1),
+                dpf: Math.floor(Math.random() * 100),
+                ant: Math.floor(Math.random() * 30 + 75),
+                rpm: Math.floor(Math.random() * 2000 + 800),
+                brz: Math.floor(Math.random() * 140),
+                load: Math.floor(Math.random() * 100),
+                iat: Math.floor(Math.random() * 40),
+                egr: Math.floor(Math.random() * 400 + 100),
+                pri: Math.floor(Math.random() * 50)
             };
-            document.getElementById('m-title').innerText = title;
-            document.getElementById('m-desc').innerText = info[title] || "Senzorski podatak u realnom vremenu.";
+
+            Object.keys(data).forEach(key => {
+                const vEl = document.getElementById(key + '-val');
+                const bEl = document.getElementById(key + '-bar');
+                if(vEl) vEl.innerText = data[key] + getUnit(key);
+                if(bEl) bEl.style.width = Math.min(data[key] / (key=='rpm'?50:1), 100) + "%";
+                if(bEl) bEl.style.backgroundColor = (key=='aku' && data[key]<12.5) ? 'var(--danger)' : 'var(--safe)';
+            });
+        }
+
+        function getUnit(k) {
+            return k=='aku'?' V':(k=='ant' || k=='iat' || k=='egr'?'°C':(k=='brz'?' km/h':(k=='pri'?' hPa':'%')));
+        }
+
+        function showInfo(t) {
+            document.getElementById('m-title').innerText = t;
+            document.getElementById('m-desc').innerText = "Očitavanje parametra " + t + " u realnom vremenu preko CAN-BUS protokola. Proverite servisnu knjižicu za tolerancije.";
             document.getElementById('modal').style.display = 'flex';
-        }
-
-        function simulateScan() {
-            const content = document.getElementById('err-content');
-            content.innerHTML = '<p style="text-align:center; color:var(--primary); font-family:Orbitron; margin-top:40px;">SKENIRANJE U TOKU...</p>';
-            
-            setTimeout(() => {
-                content.innerHTML = `
-                    <div class="error-card">
-                        <div class="err-code">P0420</div>
-                        <div class="err-desc">Katalizator: Efikasnost ispod praga (Bank 1).</div>
-                    </div>
-                    <div class="error-card">
-                        <div class="err-code">P0101</div>
-                        <div class="err-desc">Protok vazduha (MAF): Problem u opsegu/performansama.</div>
-                    </div>
-                `;
-                if(window.navigator.vibrate) window.navigator.vibrate([50, 50]);
-            }, 1500);
-        }
-
-        function simulateClear() {
-            const content = document.getElementById('err-content');
-            content.innerHTML = '<p style="text-align:center; color:var(--danger); font-family:Orbitron; margin-top:40px;">BRISANJE GREŠAKA...</p>';
-            
-            setTimeout(() => {
-                content.innerHTML = '<p style="text-align:center; color:var(--safe); margin-top:40px; font-family:Orbitron;">SISTEM ČIST - NEMA GREŠAKA</p>';
-                if(window.navigator.vibrate) window.navigator.vibrate(200);
-            }, 2000);
         }
     </script>
 </body>
