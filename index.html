@@ -133,13 +133,21 @@
 
         async function requestBluetooth() {
             try {
-                // MODIFIKOVANO DA VIDI SVE UREĐAJE (I ZVUČNIKE)
+                // PONOVO POSTAVLJENI FILTERI ZA DIJAGNOSTIKU
                 const device = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
+                    filters: [
+                        { namePrefix: 'OBD' }, 
+                        { namePrefix: 'V-LINK' }, 
+                        { namePrefix: 'ELM' },
+                        { namePrefix: 'IOS-Vlink' }
+                    ],
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
+                
                 startMode('UŽIVO', 'AUDI A4 B8', 'WA1ZZZ8K8BXXXXXXX');
-            } catch (e) { alert("Povezivanje prekinuto."); }
+            } catch (e) { 
+                alert("Povezivanje prekinuto ili uređaj nije pronađen."); 
+            }
         }
 
         function startMode(status, model, vin) {
