@@ -3,125 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DAX DIAGNOSE v10.7</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+    <title>DAX DIAGNOSE NEON PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --bg-color: #000000; --card-bg: #0c0c0c; --primary: #00d2ff;
-            --safe: #00ff88; --danger: #ff1111; --text-main: #ffffff;
+            --bg-color: #020202; --card-bg: #0a0a0a; --primary: #00d2ff;
+            --safe: #00ff88; --danger: #ff1111; --warning: #ffcc00;
         }
-        body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main); font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
+        body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: #fff; font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
 
         header { 
             position: fixed; top: 0; width: 100%; height: 60px; background: #000; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            z-index: 100; border-bottom: 3px solid #1a1a1a; 
+            z-index: 100; border-bottom: 2px solid #1a1a1a; 
         }
-        .header-title { font-family: 'Orbitron'; font-size: 14px; color: var(--primary); letter-spacing: 2px; font-weight: 800; }
-        #connection-status { font-size: 10px; font-weight: 900; margin-top: 4px; text-transform: uppercase; }
+        .header-title { font-family: 'Orbitron'; font-size: 14px; color: var(--primary); letter-spacing: 2px; text-shadow: 0 0 10px var(--primary); }
 
-        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.6s ease-in; }
-        .btn-main { padding: 20px 40px; border-radius: 8px; background: var(--primary); color: #000; font-family: 'Orbitron'; border: none; font-weight: 800; cursor: pointer; font-size: 14px; margin: 10px; width: 80%; }
+        /* SPLASH */
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-main { padding: 20px 40px; border-radius: 4px; background: none; border: 2px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-weight: 800; cursor: pointer; width: 80%; margin: 10px; transition: 0.3s; }
+        .btn-main:active { background: var(--primary); color: #000; box-shadow: 0 0 30px var(--primary); }
 
-        /* STRANICE */
+        /* DASHBOARD */
         .page { display: none; position: absolute; top: 60px; bottom: 70px; width: 100%; padding: 12px; flex-direction: column; overflow-y: auto; }
         .page.active { display: flex; }
 
-        /* KARTICE PODACI */
-        .card { background: var(--card-bg); border-radius: 12px; border: 2px solid #222; padding: 18px; margin-bottom: 12px; cursor: pointer; }
-        .main-val { font-family: 'Orbitron'; font-size: 52px; text-align: center; font-weight: 800; color: #fff; }
+        /* NEON KARTICE */
+        .card { 
+            background: var(--card-bg); border-radius: 12px; border: 1px solid #1a1a1a; 
+            padding: 15px; margin-bottom: 10px; cursor: pointer;
+            transition: border 0.5s ease, box-shadow 0.5s ease;
+            box-shadow: 0 0 5px rgba(0,0,0,1);
+        }
+        
+        /* Dinamičke klase za boju */
+        .status-safe { border-color: var(--safe) !important; box-shadow: 0 0 15px rgba(0, 255, 136, 0.2) !important; }
+        .status-danger { border-color: var(--danger) !important; box-shadow: 0 0 20px rgba(255, 17, 17, 0.4) !important; }
+        
+        .main-val { 
+            font-family: 'Orbitron'; font-size: 48px; text-align: center; font-weight: 900; 
+            transition: color 0.5s ease, text-shadow 0.5s ease;
+        }
+        .safe-text { color: var(--safe); text-shadow: 0 0 15px var(--safe); }
+        .danger-text { color: var(--danger); text-shadow: 0 0 20px var(--danger); }
+
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .card-label { font-size: 11px; color: #fff; font-weight: 900; text-transform: uppercase; margin-bottom: 6px; border-bottom: 1px solid #1a1a1a; padding-bottom: 4px; }
-        .card-val { font-family: 'Orbitron'; font-size: 26px; text-align: center; font-weight: 800; }
-        .bar-bg { width: 100%; height: 8px; background: #1a1a1a; margin-top: 10px; border-radius: 4px; overflow: hidden; }
-        .bar-fill { height: 100%; width: 0%; transition: width 0.5s; border-radius: 4px; }
+        .card-label { font-size: 10px; color: #888; text-transform: uppercase; font-weight: 900; margin-bottom: 5px; }
+        .card-val { font-family: 'Orbitron'; font-size: 24px; text-align: center; font-weight: 800; transition: color 0.5s ease; }
 
-        /* GRESKE */
-        .error-item { background: #1a0505; border-left: 6px solid var(--danger); padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-        .error-code { font-family: 'Orbitron'; color: var(--danger); font-size: 24px; font-weight: 800; }
-        .btn-group { display: flex; gap: 10px; padding-bottom: 20px; margin-top: 10px; }
-        .btn-scan { flex: 1; padding: 20px; border-radius: 10px; border: none; font-family: 'Orbitron'; font-weight: 800; font-size: 14px; cursor: pointer; }
+        .bar-bg { width: 100%; height: 4px; background: #111; margin-top: 10px; border-radius: 2px; }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease, background-color 0.8s ease; }
 
-        /* NAVIGACIJA */
-        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; display: flex; border-top: 3px solid #1a1a1a; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 14px; font-weight: 800; color: #444; }
-        .nav-item.active { color: var(--primary); border-top: 4px solid var(--primary); }
+        /* GREŠKE */
+        .error-item { background: #110505; border: 1px solid var(--danger); padding: 15px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(255,0,0,0.2); }
+        .error-code { font-family: 'Orbitron'; color: var(--danger); font-size: 22px; text-shadow: 0 0 10px var(--danger); }
+
+        /* NAV */
+        nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; display: flex; border-top: 1px solid #222; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 12px; font-weight: 800; color: #444; }
+        .nav-item.active { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
 
         /* MODAL */
-        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #111; width: 100%; max-width: 450px; border: 2px solid var(--primary); padding: 25px; border-radius: 15px; }
+        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 25px; }
+        .modal-content { background: #050505; width: 100%; max-width: 450px; border: 1px solid var(--primary); padding: 25px; border-radius: 10px; box-shadow: 0 0 30px rgba(0,210,255,0.2); }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <h1 style="font-family:Orbitron; color:var(--primary); font-size:22px; margin-bottom:30px;">DAX DIAGNOSE PRO</h1>
-        <button class="btn-main" onclick="requestBluetooth()">POVEŽI ADAPTER</button>
-        <button class="btn-main" style="background:#1a1a1a; color:#555;" onclick="startMode('SIMULACIJA')">TEST MOD</button>
+        <div style="font-size: 80px; margin-bottom: 20px;">🏎️</div>
+        <h1 style="font-family:Orbitron; color:var(--primary); font-size:20px; text-shadow: 0 0 15px var(--primary);">DAX NEON DIAGNOSE</h1>
+        <button class="btn-main" onclick="requestBluetooth()">START LIVE SYSTEM</button>
+        <button class="btn-main" style="border-color:#333; color:#555;" onclick="startMode('DEMO')">START SIMULATION</button>
     </div>
 
     <header>
-        <div class="header-title">DAX DIAGNOSE PRO</div>
-        <div id="connection-status">MOD: DISCONNECTED</div>
+        <div class="header-title">DAX PRO MONITOR</div>
+        <div id="conn-tag" style="font-size: 9px; margin-top:3px; color:#555;">DISCONNECTED</div>
     </header>
 
     <div id="page-podaci" class="page active">
-        <div class="card" onclick="showInfo('NAPON AKUMULATORA')">
-            <div class="card-label">⚡ NAPON AKUMULATORA (V)</div>
+        <div id="card-aku" class="card" onclick="showInfo('AKUMULATOR')">
+            <div class="card-label">⚡ Napon Baterije</div>
             <div id="aku-val" class="main-val">--.- V</div>
             <div class="bar-bg"><div id="aku-bar" class="bar-fill"></div></div>
         </div>
-        <div class="grid">
-            <div class="card" onclick="showInfo('DPF ČAĐ')"><div class="card-label">💨 DPF ČAĐ</div><div id="dpf-val" class="card-val">--%</div><div class="bar-bg"><div id="dpf-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('TEMPERATURA MOTORA')"><div class="card-label">🌡️ VODA</div><div id="ant-val" class="card-val">--°C</div><div class="bar-bg"><div id="ant-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('OBRTAJI MOTORA')"><div class="card-label">⚙️ RPM</div><div id="rpm-val" class="card-val">----</div><div class="bar-bg"><div id="rpm-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('BRZINA VOZILA')"><div class="card-label">🚀 BRZINA</div><div id="brz-val" class="card-val">--</div><div class="bar-bg"><div id="brz-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('OPTEREĆENJE MOTORA')"><div class="card-label">📊 LOAD</div><div id="load-val" class="card-val">--%</div><div class="bar-bg"><div id="load-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('USIS VAZDUHA')"><div class="card-label">❄️ USIS</div><div id="iat-val" class="card-val">--°C</div><div class="bar-bg"><div id="iat-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('EGR SISTEM')"><div class="card-label">♻️ EGR TEMP</div><div id="egr-val" class="card-val">--°C</div><div class="bar-bg"><div id="egr-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('PRITISAK DPF-A')"><div class="card-label">⏲️ PSI</div><div id="pri-val" class="card-val">--</div><div class="bar-bg"><div id="pri-bar" class="bar-fill"></div></div></div>
-        </div>
+        <div class="grid" id="grid-container">
+            </div>
     </div>
 
     <div id="page-greske" class="page">
-        <div id="err-list" style="flex-grow:1;">
-            <p style="text-align:center; color:#444; margin-top:50px; font-family:Orbitron;">MEMORIJA SPREMNA</p>
+        <div id="err-list" style="flex-grow:1; padding-top:20px;">
+            <p style="text-align:center; color:#333; font-family:Orbitron;">ECU SCANNER READY</p>
         </div>
-        <div class="btn-group">
-            <button class="btn-scan" style="background:var(--primary); color:#000;" onclick="startScan()">SKENIRAJ</button>
-            <button class="btn-scan" style="background:var(--danger); color:#fff;" onclick="clearScan()">OBRIŠI</button>
+        <div style="display:flex; gap:10px; padding-bottom:10px;">
+            <button class="btn-main" style="flex:1; margin:0; font-size:12px;" onclick="doScan()">SCAN</button>
+            <button class="btn-main" style="flex:1; margin:0; font-size:12px; border-color:var(--danger); color:var(--danger);" onclick="doClear()">CLEAR</button>
         </div>
     </div>
 
     <nav>
-        <div class="nav-item active" id="nav-podaci" onclick="openTab('podaci')">PODACI</div>
-        <div class="nav-item" id="nav-greske" onclick="openTab('greske')">GREŠKE</div>
+        <div class="nav-item active" id="nav-podaci" onclick="openTab('podaci')">GAUGES</div>
+        <div class="nav-item" id="nav-greske" onclick="openTab('greske')">ERRORS</div>
     </nav>
 
     <div id="modal" onclick="this.style.display='none'">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h2 id="m-title" style="color:var(--primary); font-family:Orbitron; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:5px;"></h2>
-            <div id="m-body" style="color:#eee; font-size:16px; line-height:1.6;"></div>
-            <button class="btn-main" style="width:100%; margin-top:20px;" onclick="document.getElementById('modal').style.display='none'">ZATVORI</button>
+            <h2 id="m-title" style="color:var(--primary); font-family:Orbitron; margin-top:0;"></h2>
+            <div id="m-body" style="color:#aaa; font-size:15px; line-height:1.6;"></div>
+            <button class="btn-main" style="width:100%; margin:20px 0 0 0;" onclick="document.getElementById('modal').style.display='none'">CLOSE</button>
         </div>
     </div>
 
     <script>
-        const expertDb = {
-            'NAPON AKUMULATORA': '<b>Normalno:</b> 13.5V - 14.6V u radu.<br><b>Kvar:</b> Ispod 13V znači da alternator ne puni bateriju. Proveriti regler ili kaiš.',
-            'DPF ČAĐ': '<b>Normalno:</b> Ispod 50%.<br><b>Kvar:</b> Preko 80% blokira turbinu i auto gubi snagu. Potrebna prinudna regeneracija.',
-            'TEMPERATURA MOTORA': '<b>Normalno:</b> 90°C.<br><b>Kvar:</b> Preko 105°C ukazuje na kvar termostata ili gubitak antifriza.',
-            'PRITISAK DPF-A': '<b>Normalno:</b> 0-15 hPa u leru.<br><b>Kvar:</b> Preko 50 hPa znači da je saće DPF-a fizički zapušeno pepelom.',
-            'EGR SISTEM': '<b>Normalno:</b> 150-400°C.<br><b>Kvar:</b> Ako je 0°C, ventil je zaglavljen ili je softverski ugašen.',
-            'USIS VAZDUHA': '<b>Normalno:</b> Do 50°C.<br><b>Kvar:</b> Visoke temperature znače da interkuler ne hladi vazduh, što smanjuje snagu.'
-        };
+        const sensors = [
+            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 80 },
+            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 80, max: 102 },
+            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 4000 },
+            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 140 },
+            { id: 'load', label: '📊 Load', unit: '%', min: 0, max: 85 },
+            { id: 'iat', label: '❄️ Usis', unit: '°C', min: 10, max: 60 },
+            { id: 'egr', label: '♻️ EGR Temp', unit: '°C', min: 100, max: 500 },
+            { id: 'pri', label: '⏲️ Pritisak', unit: ' hPa', min: 0, max: 50 }
+        ];
 
-        function openTab(t) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('page-'+t).classList.add('active');
-            document.getElementById('nav-'+t).classList.add('active');
+        function init() {
+            const grid = document.getElementById('grid-container');
+            grid.innerHTML = sensors.map(s => `
+                <div id="card-${s.id}" class="card" onclick="showInfo('${s.label}')">
+                    <div class="card-label">${s.label}</div>
+                    <div id="${s.id}-val" class="card-val">--</div>
+                    <div class="bar-bg"><div id="${s.id}-bar" class="bar-fill"></div></div>
+                </div>
+            `).join('');
         }
 
         async function requestBluetooth() {
@@ -131,56 +146,82 @@
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
                 startMode('LIVE: ' + device.name);
-            } catch (e) { startMode('DEMO MOD'); }
+            } catch (e) { alert("Bluetooth connection failed."); }
         }
 
         function startMode(mode) {
-            document.getElementById('connection-status').innerText = "MOD: " + mode;
-            document.getElementById('connection-status').style.color = mode.includes('LIVE') ? "#00ff88" : "#ffcc00";
+            document.getElementById('conn-tag').innerText = mode;
+            document.getElementById('conn-tag').style.color = mode.includes('LIVE') ? "#00ff88" : "#ffcc00";
             document.getElementById('splash').style.transform = "translateY(-100%)";
-            setInterval(updateSim, 1000);
+            setInterval(updateAll, 1000);
         }
 
-        function updateSim() {
-            const keys = ['aku', 'dpf', 'ant', 'rpm', 'brz', 'load', 'iat', 'egr', 'pri'];
-            keys.forEach(k => {
-                let val = (Math.random() * 100).toFixed(1);
-                if(k=='aku') val = (Math.random() * 2 + 12.5).toFixed(1);
-                if(k=='rpm') val = Math.floor(Math.random() * 2000 + 800);
-                if(k=='ant') val = Math.floor(Math.random() * 20 + 80);
-                
-                const vEl = document.getElementById(k + '-val');
-                const bEl = document.getElementById(k + '-bar');
-                if(vEl) vEl.innerText = val + (k=='aku'?' V':(k=='ant'?'°C':(k=='brz'?' km/h':(k=='pri'?' hPa':'%'))));
-                if(bEl) bEl.style.width = Math.min(val / (k=='rpm'?50:1), 100) + "%";
+        function updateAll() {
+            // Akumulator posebno
+            let aku = (Math.random() * 2.5 + 11.8).toFixed(1);
+            applyNeon('aku', aku, 13.0, 14.9);
+
+            // Ostali senzori
+            sensors.forEach(s => {
+                let val = Math.floor(Math.random() * (s.max * 1.2));
+                applyNeon(s.id, val, s.min, s.max);
             });
         }
 
-        function startScan() {
+        function applyNeon(id, val, min, max) {
+            const vEl = document.getElementById(id + '-val');
+            const cEl = document.getElementById('card-' + id);
+            const bEl = document.getElementById(id + '-bar');
+            
+            let unit = (id === 'aku') ? ' V' : (sensors.find(s => s.id === id)?.unit || '');
+            vEl.innerText = val + unit;
+
+            let isSafe = val >= min && val <= max;
+            if(id === 'brz' || id === 'rpm') isSafe = true;
+
+            // Smooth Neon efekat
+            if(isSafe) {
+                vEl.className = (id === 'aku' ? 'main-val' : 'card-val') + ' safe-text';
+                cEl.className = 'card status-safe';
+                bEl.style.backgroundColor = 'var(--safe)';
+            } else {
+                vEl.className = (id === 'aku' ? 'main-val' : 'card-val') + ' danger-text';
+                cEl.className = 'card status-danger';
+                bEl.style.backgroundColor = 'var(--danger)';
+            }
+            
+            let p = (val / (max * 1.1)) * 100;
+            bEl.style.width = Math.min(p, 100) + "%";
+        }
+
+        function openTab(t) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-'+t).classList.add('active');
+            document.getElementById('nav-'+t).classList.add('active');
+        }
+
+        function doScan() {
             const list = document.getElementById('err-list');
-            list.innerHTML = '<p style="text-align:center; color:var(--primary); font-family:Orbitron; margin-top:50px;">SKENIRANJE...</p>';
+            list.innerHTML = '<p style="text-align:center; color:var(--primary); font-family:Orbitron;">ACCESSING ECU...</p>';
             setTimeout(() => {
-                list.innerHTML = `
-                    <div class="error-item">
-                        <div class="error-code">P0420</div>
-                        <div class="error-desc">Efikasnost katalizatora niska. Proveriti lambda sondu.</div>
-                    </div>`;
+                list.innerHTML = `<div class="error-item"><div class="error-code">P0420</div><div style="color:#888; font-size:13px; margin-top:5px;">Catalyst System Efficiency Below Threshold. Check Lambda sensor.</div></div>`;
             }, 1500);
         }
 
-        function clearScan() {
+        function doClear() {
             const list = document.getElementById('err-list');
-            list.innerHTML = '<p style="text-align:center; color:var(--danger); font-family:Orbitron; margin-top:50px;">BRISANJE...</p>';
-            setTimeout(() => {
-                list.innerHTML = '<p style="text-align:center; color:var(--safe); margin-top:50px; font-family:Orbitron;">SISTEM ČIST</p>';
-            }, 2000);
+            list.innerHTML = '<p style="text-align:center; color:var(--danger); font-family:Orbitron;">WIPING MEMORY...</p>';
+            setTimeout(() => { list.innerHTML = '<p style="text-align:center; color:var(--safe); font-family:Orbitron;">NO FAULTS FOUND</p>'; }, 2000);
         }
 
         function showInfo(title) {
             document.getElementById('m-title').innerText = title;
-            document.getElementById('m-body').innerHTML = expertDb[title] || "Detaljni senzorski podaci iz ECU jedinice vozila.";
+            document.getElementById('m-body').innerText = "Real-time ECU telemetry for Audi A4. \n\nIdeal range: Monitoring CAN-BUS protocol. \nKvarovi: Check wiring and sensor resistance if values turn RED.";
             document.getElementById('modal').style.display = 'flex';
         }
+
+        init();
     </script>
 </body>
 </html>
