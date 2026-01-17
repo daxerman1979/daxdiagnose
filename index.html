@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
     <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+
     <title>DAX DIAGNOSE v11.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
@@ -14,7 +20,6 @@
         }
         body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: #fff; font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
 
-        /* SMANJEN HEADER DA SVE STANE */
         header { 
             position: fixed; top: 0; width: 100%; height: 50px; background: #000; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
@@ -23,15 +28,12 @@
         .header-title { font-family: 'Orbitron'; font-size: 11px; color: var(--primary); letter-spacing: 1px; text-shadow: 0 0 5px var(--primary); }
         #car-info { font-size: 9px; font-weight: bold; color: #888; text-transform: uppercase; margin-top: 1px; }
 
-        /* SPLASH SCREEN */
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.6s ease-in-out; }
         .btn-main { padding: 15px 30px; border-radius: 6px; background: none; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-weight: 800; cursor: pointer; width: 80%; margin: 8px; font-size: 12px; }
 
-        /* DASHBOARD - SMANJENI RAZMACI */
         .page { display: none; position: absolute; top: 50px; bottom: 65px; width: 100%; padding: 6px; flex-direction: column; }
         .page.active { display: flex; }
 
-        /* KARTICE - OPTIMIZOVANE ZA JEDAN EKRAN */
         .card { 
             background: var(--card-bg); border-radius: 10px; border: 1px solid #1a1a1a; 
             padding: 10px; margin-bottom: 6px; cursor: pointer;
@@ -52,12 +54,10 @@
         .bar-bg { width: 100%; height: 3px; background: #111; margin-top: 6px; border-radius: 2px; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease; }
 
-        /* NAVIGACIJA */
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; border-top: 1px solid #1a1a1a; z-index: 1000; }
         .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 12px; font-weight: 800; color: #333; }
         .nav-item.active { color: var(--primary); text-shadow: 0 0 8px var(--primary); }
 
-        /* MODAL */
         #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.97); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: #050505; width: 100%; max-width: 450px; border: 1px solid var(--primary); padding: 20px; border-radius: 12px; }
         .m-text { color: #ddd; font-size: 14px; line-height: 1.4; }
@@ -82,9 +82,7 @@
             <div id="aku-val" class="main-val">--.- V</div>
             <div class="bar-bg"><div id="aku-bar" class="bar-fill"></div></div>
         </div>
-
-        <div class="grid" id="main-grid">
-            </div>
+        <div class="grid" id="main-grid"></div>
     </div>
 
     <div id="page-greske" class="page">
@@ -114,12 +112,12 @@
         const sensorDb = [
             { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: '<b>Idealno:</b> Ispod 40%.<br><b>Kritično:</b> Preko 80%.<br><b>Kvarovi:</b> Zapušen EGR ili loše dizne.' },
             { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: '<b>Idealno:</b> 90°C.<br><b>Kritično:</b> Preko 105°C.<br><b>Kvarovi:</b> Termostat ili vodena pumpa.' },
-            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800, info: '<b>Ler:</b> cca 800 RPM.<br><b>Kvarovi:</b> Senzor radilice.' },
-            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135, info: 'Brzina očitana direktno sa senzora vozila.' },
-            { id: 'load', label: '📊 Opterećenje', unit: '%', min: 0, max: 80, info: 'Opterećenje motora u realnom vremenu.' },
-            { id: 'iat', label: '❄️ Usis Vazduha', unit: '°C', min: 5, max: 55, info: 'Temperatura usisnog vazduha.' },
+            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800, info: '<b>Ler:</b> cca 800 RPM.' },
+            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135, info: 'Brzina sa senzora vozila.' },
+            { id: 'load', label: '📊 Opterećenje', unit: '%', min: 0, max: 80, info: 'Opterećenje motora.' },
+            { id: 'iat', label: '❄️ Usis Vazduha', unit: '°C', min: 5, max: 55, info: 'Temperatura usisa.' },
             { id: 'egr', label: '♻️ EGR Temp', unit: '°C', min: 120, max: 450, info: 'Temperatura EGR sistema.' },
-            { id: 'pri', label: '⏲️ Difer. Pritisak', unit: ' hPa', min: 0, max: 40, info: 'Pritisak DPF filtera - pokazuje zapušenost.' }
+            { id: 'pri', label: '⏲️ Difer. Pritisak', unit: ' hPa', min: 0, max: 40, info: 'Pritisak DPF filtera.' }
         ];
 
         function init() {
@@ -135,11 +133,11 @@
 
         async function requestBluetooth() {
             try {
+                // MODIFIKOVANO DA VIDI SVE UREĐAJE (I ZVUČNIKE)
                 const device = await navigator.bluetooth.requestDevice({
-                    filters: [{ namePrefix: 'OBD' }, { namePrefix: 'V-LINK' }],
+                    acceptAllDevices: true,
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
-                // U stvarnosti ovde bi išlo očitavanje VIN-a, ovde simuliramo za Audi
                 startMode('UŽIVO', 'AUDI A4 B8', 'WA1ZZZ8K8BXXXXXXX');
             } catch (e) { alert("Povezivanje prekinuto."); }
         }
@@ -165,11 +163,9 @@
             const cEl = document.getElementById('card-' + id);
             const bEl = document.getElementById(id + '-bar');
             let unit = (id === 'aku') ? ' V' : (sensorDb.find(s => s.id === id)?.unit || '');
-            
             vEl.innerText = val + unit;
             let isSafe = val >= min && val <= max;
             if(id === 'brz' || id === 'rpm') isSafe = true;
-
             if(isSafe) {
                 vEl.className = (id === 'aku' ? 'main-val' : 'card-val') + ' safe-text';
                 cEl.className = 'card status-safe';
@@ -184,9 +180,8 @@
 
         function showInfo(label) {
             let data = (label === 'NAPON AKUMULATORA') ? 
-                { label: 'Napon Akumulatora', info: '<b>Idealno:</b> 13.8V - 14.4V u radu.<br><b>Problem:</b> Ispod 13V - Alternator ne puni.' } :
+                { label: 'Napon Akumulatora', info: '<b>Idealno:</b> 13.8V - 14.4V u radu.' } :
                 sensorDb.find(s => s.label === label);
-
             document.getElementById('m-title').innerText = data.label;
             document.getElementById('m-body').innerHTML = `<div class="m-text">${data.info}</div>`;
             document.getElementById('modal').style.display = 'flex';
@@ -201,7 +196,7 @@
 
         function doScan() {
             const list = document.getElementById('err-list');
-            list.innerHTML = '<p style="color:var(--primary); font-family:Orbitron; font-size:11px;">PRISTUPANJE ECU MEMORIJI...</p>';
+            list.innerHTML = '<p style="color:var(--primary); font-family:Orbitron; font-size:11px;">SKENIRANJE...</p>';
             setTimeout(() => {
                 list.innerHTML = `<div style="background:#110505; border:1px solid red; padding:10px; border-radius:8px; text-align:left;">
                     <div style="color:red; font-family:Orbitron; font-size:18px;">P0420</div>
@@ -213,9 +208,8 @@
         function doClear() {
             const list = document.getElementById('err-list');
             list.innerHTML = '<p style="color:red; font-family:Orbitron; font-size:11px;">BRISANJE...</p>';
-            setTimeout(() => { list.innerHTML = '<p style="color:var(--safe); font-family:Orbitron; font-size:11px;">NEMA PRONAĐENIH GREŠAKA</p>'; }, 1500);
+            setTimeout(() => { list.innerHTML = '<p style="color:var(--safe); font-family:Orbitron; font-size:11px;">SISTEM ČIST</p>'; }, 1500);
         }
-
         init();
     </script>
 </body>
