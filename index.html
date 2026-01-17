@@ -110,8 +110,8 @@
 
     <script>
         const sensorDb = [
-            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: '<b>Idealno:</b> Ispod 40%.<br><b>Kritično:</b> Preko 80%.<br><b>Kvarovi:</b> Zapušen EGR ili loše dizne.' },
-            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: '<b>Idealno:</b> 90°C.<br><b>Kritično:</b> Preko 105°C.<br><b>Kvarovi:</b> Termostat ili vodena pumpa.' },
+            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: '<b>Idealno:</b> Ispod 40%.' },
+            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: '<b>Idealno:</b> 90°C.' },
             { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800, info: '<b>Ler:</b> cca 800 RPM.' },
             { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135, info: 'Brzina sa senzora vozila.' },
             { id: 'load', label: '📊 Opterećenje', unit: '%', min: 0, max: 80, info: 'Opterećenje motora.' },
@@ -133,21 +133,16 @@
 
         async function requestBluetooth() {
             try {
-                // PONOVO POSTAVLJENI FILTERI ZA DIJAGNOSTIKU
+                // FILTERI VRAĆENI SAMO ZA ADAPTERE
                 const device = await navigator.bluetooth.requestDevice({
                     filters: [
-                        { namePrefix: 'OBD' }, 
-                        { namePrefix: 'V-LINK' }, 
-                        { namePrefix: 'ELM' },
-                        { namePrefix: 'IOS-Vlink' }
+                        { namePrefix: 'OBD' }, { namePrefix: 'V-LINK' }, 
+                        { namePrefix: 'ELM' }, { namePrefix: 'IOS-Vlink' }
                     ],
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
-                
                 startMode('UŽIVO', 'AUDI A4 B8', 'WA1ZZZ8K8BXXXXXXX');
-            } catch (e) { 
-                alert("Povezivanje prekinuto ili uređaj nije pronađen."); 
-            }
+            } catch (e) { alert("Povezivanje prekinuto ili uređaj nije pronađen."); }
         }
 
         function startMode(status, model, vin) {
