@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DAX DIAGNOSE PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --bg-color: #050505; --card-bg: #121212; --primary: #00d2ff;
+            --safe: #00ff88; --danger: #ff3333; --text-main: #ffffff;
+        }
+        body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main); font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
+
+        header { position: fixed; top: 0; width: 100%; height: 45px; background: #000; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 11px; color: var(--primary); z-index: 100; border-bottom: 1px solid #222; }
+
+        /* SPLASH SCREEN */
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.8s ease-in-out; }
+        .car-anim { font-size: 70px; margin-bottom: 20px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .loader-container { width: 60%; height: 4px; background: #222; margin: 20px 0; border-radius: 5px; overflow: hidden; }
+        .loader-bar { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s linear; }
+        #connect-btn { padding: 15px 35px; border-radius: 30px; background: var(--primary); color: #000; font-family: 'Orbitron'; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 0 20px var(--primary); }
+
+        /* DASHBOARD LAYOUT */
+        .page { display: none; position: absolute; top: 45px; bottom: 65px; width: 100%; padding: 10px; flex-direction: column; justify-content: space-between; }
+        .page.active { display: flex; }
+        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid #222; padding: 12px; }
+        .main-val { font-family: 'Orbitron'; font-size: 38px; text-align: center; margin: 5px 0; transition: color 0.3s; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-grow: 1; }
+        .small-card { padding: 10px; display: flex; flex-direction: column; justify-content: center; }
+        .card-label { font-size: 8px; color: #888; text-transform: uppercase; }
+        .card-val { font-family: 'Orbitron'; font-size: 18px; text-align: center; margin: 3px 0; transition: color 0.3s; }
+        .bar-bg { width: 100%; height: 3px; background: #222; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.5s, background 0.3s; }
+
+        /* NAV */
+        nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #111; display: flex; border-top: 1px solid #222; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #555; font-weight: bold; }
+        .nav-item.active { color: var(--primary); background: #181818; border-top: 3px solid var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div id="splash">
+        <div class="car-anim">🏎️</div>
+        <div id="status" style="font-family: Orbitron; font-size: 10px; color: var(--primary); margin-bottom: 10px;">DAX DIAGNOSE INICIJALIZACIJA...</div>
+        <div class="loader-container"><div id="loader-bar" class="loader-bar"></div></div>
+        <button id="connect-btn" style="display:none;" onclick="connectBluetooth()">POVEŽI VGATE iCAR</button>
+    </div>
+
+    <header id="v-header">DAX DIAGNOSE v10.0</header>
+
+    <div id="page-podaci" class="page active">
+        <div class="card">
+            <div class="card-label">⚡ NAPON AKUMULATORA</div>
+            <div id="aku-val" class="main-val">--.- V</div>
+            <div class="bar-bg"><div id="aku-bar" class="bar-fill"></div></div>
+        </div>
+        <div class="grid">
+            <div class="card small-card"><div class="card-label">💨 DPF ČAĐ</div><div id="dpf-val" class="card-val">--%</div><div class="bar-bg"><div id="dpf-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card"><div class="card-label">🌡️ ANTIFRIZ</div><div id="ant-val" class="card-val">--°C</div><div class="bar-bg"><div id="ant-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card"><div class="card-label">⚙️ OBRTAJI</div><div id="rpm-val" class="card-val">----</div><div class="bar-bg"><div id="rpm-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card"><div class="card-label">🚀 BRZINA</div><div id="brz-val" class="card-val">--</div><div class="bar-bg"><div id="brz-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card"><div class="card-label">📊 OPTEREĆENJE</div><div id="load-val" class="card-val">--%</div><div class="bar-bg"><div id="load-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card"><div class="card-label">❄️ USIS VAZDUHA</div><div id="iat-val" class="card-val">--°C</div><div class="bar-bg"><div id="iat-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card"><div class="card-label">♻️ EGR TEMP</div><div id="egr-val" class="card-val">--°C</div><div class="bar-bg"><div id="egr-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card"><div class="card-label">⏲️ PRITISAK</div><div id="pri-val" class="card-val">-- hPa</div><div class="bar-bg"><div id="pri-bar" class="bar-fill"></div></div></div>
+        </div>
+    </div>
+
+    <nav>
+        <div class="nav-item active">📊<span>PODACI</span></div>
+        <div class="nav-item" onclick="alert('Mod grešaka se učitava nakon povezivanja...')">⚠️<span>GREŠKE</span></div>
+    </nav>
+
+    <script>
+        const OBD_UUID = "00001101-0000-1000-8000-00805f9b34fb";
+        let obdCharacteristic = null;
+
+        const state = {
+            aku: { val: 0, min: 13.1, max: 14.8 },
+            dpf: { val: 0, min: 0, max: 80 },
+            ant: { val: 0, min: 85, max: 102 },
+            rpm: { val: 0, min: 0, max: 3500 },
+            brz: { val: 0, min: 0, max: 130 },
+            load: { val: 0, min: 0, max: 90 },
+            iat: { id: 'iat', val: 0, min: 10, max: 55 },
+            egr: { val: 0, min: 150, max: 600 },
+            pri: { val: 0, min: 0, max: 45 }
+        };
+
+        // Splash progres
+        let loadP = 0;
+        const intro = setInterval(() => {
+            loadP += 5;
+            document.getElementById('loader-bar').style.width = loadP + "%";
+            if(loadP >= 100) {
+                clearInterval(intro);
+                document.getElementById('status').innerText = "VGATE SPREMAN";
+                document.getElementById('connect-btn').style.display = "block";
+            }
+        }, 50);
+
+        async function connectBluetooth() {
+            try {
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ namePrefix: 'OBD' }, { namePrefix: 'V-LINK' }],
+                    optionalServices: [OBD_UUID]
+                });
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService(OBD_UUID);
+                obdCharacteristic = await service.getCharacteristic(OBD_UUID);
+
+                // Slanje inicijalnih komandi autu
+                await sendCmd("ATZ");   // Reset
+                await sendCmd("ATSP0"); // Auto protokol
+                
+                document.getElementById('splash').style.transform = "translateY(-100%)";
+                startPolling();
+            } catch (e) {
+                alert("Greška ili otkazano. Ulazim u demo.");
+                document.getElementById('splash').style.transform = "translateY(-100%)";
+                startDemo();
+            }
+        }
+
+        async function sendCmd(cmd) {
+            const enc = new TextEncoder();
+            await obdCharacteristic.writeValue(enc.encode(cmd + "\r"));
+            return new Promise(r => setTimeout(r, 300));
+        }
+
+        function startPolling() {
+            setInterval(async () => {
+                // Primer za RPM (010C)
+                let rpmHex = await readPID("010C");
+                if(rpmHex) {
+                    let parts = rpmHex.split(' ');
+                    let val = Math.round(((parseInt(parts[2], 16) * 256) + parseInt(parts[3], 16)) / 4);
+                    updateUI('rpm', val);
+                }
+            }, 1000);
+        }
+
+        async function readPID(pid) {
+            const enc = new TextEncoder();
+            await obdCharacteristic.writeValue(enc.encode(pid + "\r"));
+            const val = await obdCharacteristic.readValue();
+            return new TextDecoder().decode(val);
+        }
+
+        function startDemo() {
+            setInterval(() => {
+                updateUI('aku', (Math.random() * (14.6 - 11.8) + 11.8).toFixed(1));
+                updateUI('dpf', Math.floor(Math.random() * 95));
+                updateUI('ant', Math.floor(Math.random() * (105 - 75) + 75));
+                updateUI('rpm', Math.floor(Math.random() * (3500 - 800) + 800));
+                updateUI('brz', Math.floor(Math.random() * 120));
+            }, 1000);
+        }
+
+        function updateUI(id, val) {
+            const vEl = document.getElementById(id + '-val');
+            const bEl = document.getElementById(id + '-bar');
+            if(!vEl) return;
+            
+            vEl.innerText = val + (id=='aku'?' V':(id=='ant'?'°C':(id=='dpf'?'%':'')));
+            let s = state[id];
+            if(s) {
+                let p = (val / (id=='rpm'?5000:100)) * 100;
+                bEl.style.width = Math.min(p, 100) + "%";
+                let ok = val >= s.min && val <= s.max;
+                bEl.style.backgroundColor = ok ? 'var(--safe)' : 'var(--danger)';
+                vEl.style.color = ok ? 'white' : 'var(--danger)';
+            }
+        }
+    </script>
+</body>
+</html>
