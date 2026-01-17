@@ -15,25 +15,31 @@
 
         header { position: fixed; top: 0; width: 100%; height: 45px; background: #000; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 11px; color: var(--primary); z-index: 100; border-bottom: 1px solid #222; }
 
-        /* SPLASH SCREEN */
+        /* SPLASH */
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.8s ease-in-out; }
-        .car-anim { font-size: 70px; margin-bottom: 20px; animation: pulse 2s infinite; }
+        .car-anim { font-size: 70px; margin-bottom: 20px; animation: pulse 2s infinite; cursor: pointer; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         .loader-container { width: 60%; height: 4px; background: #222; margin: 20px 0; border-radius: 5px; overflow: hidden; }
         .loader-bar { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s linear; }
-        #connect-btn { padding: 15px 35px; border-radius: 30px; background: var(--primary); color: #000; font-family: 'Orbitron'; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 0 20px var(--primary); }
+        #connect-btn { padding: 15px 35px; border-radius: 30px; background: var(--primary); color: #000; font-family: 'Orbitron'; border: none; font-weight: bold; cursor: pointer; }
 
-        /* DASHBOARD LAYOUT */
+        /* DASHBOARD */
         .page { display: none; position: absolute; top: 45px; bottom: 65px; width: 100%; padding: 10px; flex-direction: column; justify-content: space-between; }
         .page.active { display: flex; }
-        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid #222; padding: 12px; }
-        .main-val { font-family: 'Orbitron'; font-size: 38px; text-align: center; margin: 5px 0; transition: color 0.3s; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-grow: 1; }
+        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid #222; padding: 12px; cursor: pointer; }
+        .main-val { font-family: 'Orbitron'; font-size: 38px; text-align: center; margin: 5px 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-grow: 1; margin-top: 5px; }
         .small-card { padding: 10px; display: flex; flex-direction: column; justify-content: center; }
         .card-label { font-size: 8px; color: #888; text-transform: uppercase; }
-        .card-val { font-family: 'Orbitron'; font-size: 18px; text-align: center; margin: 3px 0; transition: color 0.3s; }
+        .card-val { font-family: 'Orbitron'; font-size: 18px; text-align: center; margin: 3px 0; }
         .bar-bg { width: 100%; height: 3px; background: #222; margin-top: 5px; border-radius: 2px; overflow: hidden; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.5s, background 0.3s; }
+
+        /* MODAL */
+        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 25px; }
+        .modal-content { background: #151515; width: 100%; max-width: 350px; border-radius: 20px; border: 1px solid var(--primary); padding: 25px; box-shadow: 0 0 30px rgba(0,210,255,0.2); }
+        .m-title { font-family: 'Orbitron'; color: var(--primary); font-size: 18px; margin: 0 0 15px 0; }
+        .m-desc { font-size: 14px; line-height: 1.6; color: #ccc; white-space: pre-line; margin-bottom: 20px; }
 
         /* NAV */
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #111; display: flex; border-top: 1px solid #222; }
@@ -44,120 +50,99 @@
 <body>
 
     <div id="splash">
-        <div class="car-anim">🏎️</div>
+        <div class="car-anim" onclick="startDemo()">🏎️</div>
         <div id="status" style="font-family: Orbitron; font-size: 10px; color: var(--primary); margin-bottom: 10px;">DAX DIAGNOSE INICIJALIZACIJA...</div>
         <div class="loader-container"><div id="loader-bar" class="loader-bar"></div></div>
         <button id="connect-btn" style="display:none;" onclick="connectBluetooth()">POVEŽI VGATE iCAR</button>
     </div>
 
-    <header id="v-header">DAX DIAGNOSE v10.0</header>
+    <header id="v-header">DAX DIAGNOSE v10.1</header>
 
     <div id="page-podaci" class="page active">
-        <div class="card">
+        <div class="card" onclick="showInfo('AKUMULATOR')">
             <div class="card-label">⚡ NAPON AKUMULATORA</div>
             <div id="aku-val" class="main-val">--.- V</div>
             <div class="bar-bg"><div id="aku-bar" class="bar-fill"></div></div>
         </div>
         <div class="grid">
-            <div class="card small-card"><div class="card-label">💨 DPF ČAĐ</div><div id="dpf-val" class="card-val">--%</div><div class="bar-bg"><div id="dpf-bar" class="bar-fill"></div></div></div>
-            <div class="card small-card"><div class="card-label">🌡️ ANTIFRIZ</div><div id="ant-val" class="card-val">--°C</div><div class="bar-bg"><div id="ant-bar" class="bar-fill"></div></div></div>
-            <div class="card small-card"><div class="card-label">⚙️ OBRTAJI</div><div id="rpm-val" class="card-val">----</div><div class="bar-bg"><div id="rpm-bar" class="bar-fill"></div></div></div>
-            <div class="card small-card"><div class="card-label">🚀 BRZINA</div><div id="brz-val" class="card-val">--</div><div class="bar-bg"><div id="brz-bar" class="bar-fill"></div></div></div>
-            <div class="card small-card"><div class="card-label">📊 OPTEREĆENJE</div><div id="load-val" class="card-val">--%</div><div class="bar-bg"><div id="load-bar" class="bar-fill"></div></div></div>
-            <div class="card small-card"><div class="card-label">❄️ USIS VAZDUHA</div><div id="iat-val" class="card-val">--°C</div><div class="bar-bg"><div id="iat-bar" class="bar-fill"></div></div></div>
-            <div class="card small-card"><div class="card-label">♻️ EGR TEMP</div><div id="egr-val" class="card-val">--°C</div><div class="bar-bg"><div id="egr-bar" class="bar-fill"></div></div></div>
-            <div class="card small-card"><div class="card-label">⏲️ PRITISAK</div><div id="pri-val" class="card-val">-- hPa</div><div class="bar-bg"><div id="pri-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card" onclick="showInfo('DPF')"><div class="card-label">💨 DPF ČAĐ</div><div id="dpf-val" class="card-val">--%</div><div class="bar-bg"><div id="dpf-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card" onclick="showInfo('ANTIFRIZ')"><div class="card-label">🌡️ ANTIFRIZ</div><div id="ant-val" class="card-val">--°C</div><div class="bar-bg"><div id="ant-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card" onclick="showInfo('OBRTAJI')"><div class="card-label">⚙️ OBRTAJI</div><div id="rpm-val" class="card-val">----</div><div class="bar-bg"><div id="rpm-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card" onclick="showInfo('BRZINA')"><div class="card-label">🚀 BRZINA</div><div id="brz-val" class="card-val">--</div><div class="bar-bg"><div id="brz-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card" onclick="showInfo('LOAD')"><div class="card-label">📊 OPTEREĆENJE</div><div id="load-val" class="card-val">--%</div><div class="bar-bg"><div id="load-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card" onclick="showInfo('IAT')"><div class="card-label">❄️ USIS VAZDUHA</div><div id="iat-val" class="card-val">--°C</div><div class="bar-bg"><div id="iat-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card" onclick="showInfo('EGR')"><div class="card-label">♻️ EGR TEMP</div><div id="egr-val" class="card-val">--°C</div><div class="bar-bg"><div id="egr-bar" class="bar-fill"></div></div></div>
+            <div class="card small-card" onclick="showInfo('PRITISAK')"><div class="card-label">⏲️ PRITISAK</div><div id="pri-val" class="card-val">-- hPa</div><div class="bar-bg"><div id="pri-bar" class="bar-fill"></div></div></div>
+        </div>
+    </div>
+
+    <div id="modal" onclick="this.style.display='none'">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 id="m-title" class="m-title"></h2>
+            <p id="m-desc" class="m-desc"></p>
+            <button style="background:var(--primary); width:100%; padding:12px; border:none; border-radius:10px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('modal').style.display='none'">ZATVORI</button>
         </div>
     </div>
 
     <nav>
         <div class="nav-item active">📊<span>PODACI</span></div>
-        <div class="nav-item" onclick="alert('Mod grešaka se učitava nakon povezivanja...')">⚠️<span>GREŠKE</span></div>
+        <div class="nav-item">⚠️<span>GREŠKE</span></div>
     </nav>
 
     <script>
-        const OBD_UUID = "00001101-0000-1000-8000-00805f9b34fb";
-        let obdCharacteristic = null;
-
         const state = {
-            aku: { val: 0, min: 13.1, max: 14.8 },
-            dpf: { val: 0, min: 0, max: 80 },
-            ant: { val: 0, min: 85, max: 102 },
-            rpm: { val: 0, min: 0, max: 3500 },
-            brz: { val: 0, min: 0, max: 130 },
-            load: { val: 0, min: 0, max: 90 },
-            iat: { id: 'iat', val: 0, min: 10, max: 55 },
-            egr: { val: 0, min: 150, max: 600 },
-            pri: { val: 0, min: 0, max: 45 }
+            aku: { val: 0, min: 13.1, max: 14.8, unit: ' V' },
+            dpf: { val: 0, min: 0, max: 80, unit: '%' },
+            ant: { val: 0, min: 85, max: 102, unit: '°C' },
+            rpm: { val: 0, min: 0, max: 3500, unit: '' },
+            brz: { val: 0, min: 0, max: 130, unit: ' km/h' },
+            load: { val: 0, min: 0, max: 90, unit: '%' },
+            iat: { val: 0, min: 10, max: 55, unit: '°C' },
+            egr: { val: 0, min: 150, max: 600, unit: '°C' },
+            pri: { val: 0, min: 0, max: 45, unit: ' hPa' }
         };
 
-        // Splash progres
+        const infoTexts = {
+            'AKUMULATOR': 'Napon alternatora i baterije.\n- Ispod 12.8V: Motor ugašen ili alternator ne puni.\n- 13.5V do 14.8V: Normalan rad punjenja.',
+            'DPF': 'Zasićenost DPF filtera česticama čađi.\n- Preko 80%: Potrebna pasivna regeneracija (vožnja na otvorenom putu).',
+            'ANTIFRIZ': 'Temperatura rashladne tečnosti motora.\n- Radna temperatura: 88°C - 100°C.\n- Preko 105°C: Rizik od pregrevanja.',
+            'OBRTAJI': 'Brzina rada motora (RPM).\n- Ler gas: cca 800 RPM.\n- Max snaga: cca 3500-4000 RPM.',
+            'BRZINA': 'Trenutna brzina kretanja vozila očitana direktno sa senzora menjača.',
+            'LOAD': 'Engine Load - Procenat opterećenja motora.\nPokazuje koliko snage motor trenutno koristi u odnosu na maksimalnu.',
+            'IAT': 'Intake Air Temp - Temperatura vazduha na usisu.\nBitno za turbo motore: hladniji vazduh znači više snage.',
+            'EGR': 'Exhaust Gas Recirculation Temp.\nTemperatura gasova koji se vraćaju u motor radi smanjenja emisije.',
+            'PRITISAK': 'Diferencijalni pritisak u DPF filteru.\nVisok pritisak (preko 50 hPa u leru) ukazuje na zapušen filter.'
+        };
+
         let loadP = 0;
         const intro = setInterval(() => {
             loadP += 5;
             document.getElementById('loader-bar').style.width = loadP + "%";
             if(loadP >= 100) {
                 clearInterval(intro);
-                document.getElementById('status').innerText = "VGATE SPREMAN";
+                document.getElementById('status').innerText = "SISTEM SPREMAN";
                 document.getElementById('connect-btn').style.display = "block";
             }
         }, 50);
 
-        async function connectBluetooth() {
-            try {
-                const device = await navigator.bluetooth.requestDevice({
-                    filters: [{ namePrefix: 'OBD' }, { namePrefix: 'V-LINK' }],
-                    optionalServices: [OBD_UUID]
-                });
-                const server = await device.gatt.connect();
-                const service = await server.getPrimaryService(OBD_UUID);
-                obdCharacteristic = await service.getCharacteristic(OBD_UUID);
-
-                // Slanje inicijalnih komandi autu
-                await sendCmd("ATZ");   // Reset
-                await sendCmd("ATSP0"); // Auto protokol
-                
-                document.getElementById('splash').style.transform = "translateY(-100%)";
-                startPolling();
-            } catch (e) {
-                alert("Greška ili otkazano. Ulazim u demo.");
-                document.getElementById('splash').style.transform = "translateY(-100%)";
-                startDemo();
-            }
-        }
-
-        async function sendCmd(cmd) {
-            const enc = new TextEncoder();
-            await obdCharacteristic.writeValue(enc.encode(cmd + "\r"));
-            return new Promise(r => setTimeout(r, 300));
-        }
-
-        function startPolling() {
-            setInterval(async () => {
-                // Primer za RPM (010C)
-                let rpmHex = await readPID("010C");
-                if(rpmHex) {
-                    let parts = rpmHex.split(' ');
-                    let val = Math.round(((parseInt(parts[2], 16) * 256) + parseInt(parts[3], 16)) / 4);
-                    updateUI('rpm', val);
-                }
-            }, 1000);
-        }
-
-        async function readPID(pid) {
-            const enc = new TextEncoder();
-            await obdCharacteristic.writeValue(enc.encode(pid + "\r"));
-            const val = await obdCharacteristic.readValue();
-            return new TextDecoder().decode(val);
+        function showInfo(title) {
+            document.getElementById('m-title').innerText = title;
+            document.getElementById('m-desc').innerText = infoTexts[title] || "Podaci sa senzora u realnom vremenu.";
+            document.getElementById('modal').style.display = 'flex';
         }
 
         function startDemo() {
+            document.getElementById('splash').style.transform = "translateY(-100%)";
             setInterval(() => {
                 updateUI('aku', (Math.random() * (14.6 - 11.8) + 11.8).toFixed(1));
-                updateUI('dpf', Math.floor(Math.random() * 95));
-                updateUI('ant', Math.floor(Math.random() * (105 - 75) + 75));
+                updateUI('dpf', Math.floor(Math.random() * 98));
+                updateUI('ant', Math.floor(Math.random() * (108 - 72) + 72));
                 updateUI('rpm', Math.floor(Math.random() * (3500 - 800) + 800));
                 updateUI('brz', Math.floor(Math.random() * 120));
+                updateUI('load', Math.floor(Math.random() * 100));
+                updateUI('iat', Math.floor(Math.random() * 50));
+                updateUI('egr', Math.floor(Math.random() * 500 + 100));
+                updateUI('pri', Math.floor(Math.random() * 60));
             }, 1000);
         }
 
@@ -165,16 +150,18 @@
             const vEl = document.getElementById(id + '-val');
             const bEl = document.getElementById(id + '-bar');
             if(!vEl) return;
-            
-            vEl.innerText = val + (id=='aku'?' V':(id=='ant'?'°C':(id=='dpf'?'%':'')));
-            let s = state[id];
-            if(s) {
-                let p = (val / (id=='rpm'?5000:100)) * 100;
-                bEl.style.width = Math.min(p, 100) + "%";
-                let ok = val >= s.min && val <= s.max;
-                bEl.style.backgroundColor = ok ? 'var(--safe)' : 'var(--danger)';
-                vEl.style.color = ok ? 'white' : 'var(--danger)';
-            }
+            vEl.innerText = val + state[id].unit;
+            let p = (val / (id=='rpm'?5000:id=='egr'?700:100)) * 100;
+            bEl.style.width = Math.min(p, 100) + "%";
+            let ok = val >= state[id].min && val <= state[id].max;
+            if(id=='brz' || id=='rpm') ok = true;
+            bEl.style.backgroundColor = ok ? 'var(--safe)' : 'var(--danger)';
+            vEl.style.color = ok ? 'white' : 'var(--danger)';
+        }
+
+        async function connectBluetooth() {
+            // Simulacija ulaska u app jer nemamo adapter trenutno
+            startDemo();
         }
     </script>
 </body>
