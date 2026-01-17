@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DAX DIAGNOSE v10.6</title>
+    <title>DAX DIAGNOSE v10.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -24,30 +24,29 @@
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.6s ease-in; }
         .btn-main { padding: 20px 40px; border-radius: 8px; background: var(--primary); color: #000; font-family: 'Orbitron'; border: none; font-weight: 800; cursor: pointer; font-size: 14px; margin: 10px; width: 80%; }
 
+        /* STRANICE */
         .page { display: none; position: absolute; top: 60px; bottom: 70px; width: 100%; padding: 12px; flex-direction: column; overflow-y: auto; }
         .page.active { display: flex; }
 
         /* KARTICE PODACI */
-        .card { background: var(--card-bg); border-radius: 12px; border: 2px solid #222; padding: 20px; margin-bottom: 12px; cursor: pointer; }
+        .card { background: var(--card-bg); border-radius: 12px; border: 2px solid #222; padding: 18px; margin-bottom: 12px; cursor: pointer; }
         .main-val { font-family: 'Orbitron'; font-size: 52px; text-align: center; font-weight: 800; color: #fff; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .card-label { font-size: 13px; color: #fff; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; }
-        .card-val { font-family: 'Orbitron'; font-size: 30px; text-align: center; font-weight: 800; }
-        .bar-bg { width: 100%; height: 10px; background: #1a1a1a; margin-top: 12px; border-radius: 5px; }
-        .bar-fill { height: 100%; width: 0%; transition: width 0.5s; border-radius: 5px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .card-label { font-size: 11px; color: #fff; font-weight: 900; text-transform: uppercase; margin-bottom: 6px; border-bottom: 1px solid #1a1a1a; padding-bottom: 4px; }
+        .card-val { font-family: 'Orbitron'; font-size: 26px; text-align: center; font-weight: 800; }
+        .bar-bg { width: 100%; height: 8px; background: #1a1a1a; margin-top: 10px; border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.5s; border-radius: 4px; }
 
-        /* TAB GREŠKE */
-        .error-item { background: #1a0505; border-left: 6px solid var(--danger); padding: 15px; border-radius: 10px; margin-bottom: 15px; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* GRESKE */
+        .error-item { background: #1a0505; border-left: 6px solid var(--danger); padding: 15px; border-radius: 10px; margin-bottom: 15px; }
         .error-code { font-family: 'Orbitron'; color: var(--danger); font-size: 24px; font-weight: 800; }
-        .error-desc { color: #eee; font-size: 15px; margin-top: 5px; font-weight: bold; }
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; padding-bottom: 20px; }
+        .btn-group { display: flex; gap: 10px; padding-bottom: 20px; margin-top: 10px; }
         .btn-scan { flex: 1; padding: 20px; border-radius: 10px; border: none; font-family: 'Orbitron'; font-weight: 800; font-size: 14px; cursor: pointer; }
 
         /* NAVIGACIJA */
         nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; display: flex; border-top: 3px solid #1a1a1a; z-index: 1000; }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 14px; font-weight: 800; color: #444; cursor: pointer; }
-        .nav-item.active { color: var(--primary); background: #0a0a0a; border-top: 4px solid var(--primary); }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 14px; font-weight: 800; color: #444; }
+        .nav-item.active { color: var(--primary); border-top: 4px solid var(--primary); }
 
         /* MODAL */
         #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
@@ -59,7 +58,7 @@
     <div id="splash">
         <h1 style="font-family:Orbitron; color:var(--primary); font-size:22px; margin-bottom:30px;">DAX DIAGNOSE PRO</h1>
         <button class="btn-main" onclick="requestBluetooth()">POVEŽI ADAPTER</button>
-        <button class="btn-main" style="background:#1a1a1a; color:#555;" onclick="startMode('SIMULACIJA')">TEST MOD (BEZ ADAPTERA)</button>
+        <button class="btn-main" style="background:#1a1a1a; color:#555;" onclick="startMode('SIMULACIJA')">TEST MOD</button>
     </div>
 
     <header>
@@ -74,20 +73,24 @@
             <div class="bar-bg"><div id="aku-bar" class="bar-fill"></div></div>
         </div>
         <div class="grid">
-            <div class="card" onclick="showInfo('ZASIĆENOST DPF-A')"><div class="card-label">💨 DPF ČAĐ</div><div id="dpf-val" class="card-val">--%</div><div class="bar-bg"><div id="dpf-bar" class="bar-fill"></div></div></div>
-            <div class="card" onclick="showInfo('TEMPERATURA MOTORA')"><div class="card-label">🌡️ VODA (°C)</div><div id="ant-val" class="card-val">--°C</div><div class="bar-bg"><div id="ant-bar" class="bar-fill"></div></div></div>
+            <div class="card" onclick="showInfo('DPF ČAĐ')"><div class="card-label">💨 DPF ČAĐ</div><div id="dpf-val" class="card-val">--%</div><div class="bar-bg"><div id="dpf-bar" class="bar-fill"></div></div></div>
+            <div class="card" onclick="showInfo('TEMPERATURA MOTORA')"><div class="card-label">🌡️ VODA</div><div id="ant-val" class="card-val">--°C</div><div class="bar-bg"><div id="ant-bar" class="bar-fill"></div></div></div>
             <div class="card" onclick="showInfo('OBRTAJI MOTORA')"><div class="card-label">⚙️ RPM</div><div id="rpm-val" class="card-val">----</div><div class="bar-bg"><div id="rpm-bar" class="bar-fill"></div></div></div>
             <div class="card" onclick="showInfo('BRZINA VOZILA')"><div class="card-label">🚀 BRZINA</div><div id="brz-val" class="card-val">--</div><div class="bar-bg"><div id="brz-bar" class="bar-fill"></div></div></div>
+            <div class="card" onclick="showInfo('OPTEREĆENJE MOTORA')"><div class="card-label">📊 LOAD</div><div id="load-val" class="card-val">--%</div><div class="bar-bg"><div id="load-bar" class="bar-fill"></div></div></div>
+            <div class="card" onclick="showInfo('USIS VAZDUHA')"><div class="card-label">❄️ USIS</div><div id="iat-val" class="card-val">--°C</div><div class="bar-bg"><div id="iat-bar" class="bar-fill"></div></div></div>
+            <div class="card" onclick="showInfo('EGR SISTEM')"><div class="card-label">♻️ EGR TEMP</div><div id="egr-val" class="card-val">--°C</div><div class="bar-bg"><div id="egr-bar" class="bar-fill"></div></div></div>
+            <div class="card" onclick="showInfo('PRITISAK DPF-A')"><div class="card-label">⏲️ PSI</div><div id="pri-val" class="card-val">--</div><div class="bar-bg"><div id="pri-bar" class="bar-fill"></div></div></div>
         </div>
     </div>
 
     <div id="page-greske" class="page">
         <div id="err-list" style="flex-grow:1;">
-            <p style="text-align:center; color:#444; margin-top:50px; font-family:Orbitron;">OBDII MEMORIJA SPREMNA</p>
+            <p style="text-align:center; color:#444; margin-top:50px; font-family:Orbitron;">MEMORIJA SPREMNA</p>
         </div>
         <div class="btn-group">
-            <button class="btn-scan" style="background:var(--primary); color:#000;" onclick="startScan()">SKENIRAJ ECU</button>
-            <button class="btn-scan" style="background:var(--danger); color:#fff;" onclick="clearScan()">OBRIŠI GREŠKE</button>
+            <button class="btn-scan" style="background:var(--primary); color:#000;" onclick="startScan()">SKENIRAJ</button>
+            <button class="btn-scan" style="background:var(--danger); color:#fff;" onclick="clearScan()">OBRIŠI</button>
         </div>
     </div>
 
@@ -98,13 +101,22 @@
 
     <div id="modal" onclick="this.style.display='none'">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h2 id="m-title" style="color:var(--primary); font-family:Orbitron; margin-bottom:15px;"></h2>
-            <div id="m-body" style="color:#eee; font-size:16px; line-height:1.5;"></div>
-            <button class="btn-main" style="width:100%; margin:20px 0 0 0;" onclick="document.getElementById('modal').style.display='none'">ZATVORI</button>
+            <h2 id="m-title" style="color:var(--primary); font-family:Orbitron; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:5px;"></h2>
+            <div id="m-body" style="color:#eee; font-size:16px; line-height:1.6;"></div>
+            <button class="btn-main" style="width:100%; margin-top:20px;" onclick="document.getElementById('modal').style.display='none'">ZATVORI</button>
         </div>
     </div>
 
     <script>
+        const expertDb = {
+            'NAPON AKUMULATORA': '<b>Normalno:</b> 13.5V - 14.6V u radu.<br><b>Kvar:</b> Ispod 13V znači da alternator ne puni bateriju. Proveriti regler ili kaiš.',
+            'DPF ČAĐ': '<b>Normalno:</b> Ispod 50%.<br><b>Kvar:</b> Preko 80% blokira turbinu i auto gubi snagu. Potrebna prinudna regeneracija.',
+            'TEMPERATURA MOTORA': '<b>Normalno:</b> 90°C.<br><b>Kvar:</b> Preko 105°C ukazuje na kvar termostata ili gubitak antifriza.',
+            'PRITISAK DPF-A': '<b>Normalno:</b> 0-15 hPa u leru.<br><b>Kvar:</b> Preko 50 hPa znači da je saće DPF-a fizički zapušeno pepelom.',
+            'EGR SISTEM': '<b>Normalno:</b> 150-400°C.<br><b>Kvar:</b> Ako je 0°C, ventil je zaglavljen ili je softverski ugašen.',
+            'USIS VAZDUHA': '<b>Normalno:</b> Do 50°C.<br><b>Kvar:</b> Visoke temperature znače da interkuler ne hladi vazduh, što smanjuje snagu.'
+        };
+
         function openTab(t) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -119,7 +131,7 @@
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
                 startMode('LIVE: ' + device.name);
-            } catch (e) { alert("Bluetooth nije povezan."); }
+            } catch (e) { startMode('DEMO MOD'); }
         }
 
         function startMode(mode) {
@@ -130,55 +142,44 @@
         }
 
         function updateSim() {
-            const data = {
-                aku: (Math.random() * 2 + 12.5).toFixed(1),
-                dpf: Math.floor(Math.random() * 100),
-                ant: Math.floor(Math.random() * 20 + 80),
-                rpm: Math.floor(Math.random() * 1500 + 800),
-                brz: Math.floor(Math.random() * 130)
-            };
-            Object.keys(data).forEach(k => {
+            const keys = ['aku', 'dpf', 'ant', 'rpm', 'brz', 'load', 'iat', 'egr', 'pri'];
+            keys.forEach(k => {
+                let val = (Math.random() * 100).toFixed(1);
+                if(k=='aku') val = (Math.random() * 2 + 12.5).toFixed(1);
+                if(k=='rpm') val = Math.floor(Math.random() * 2000 + 800);
+                if(k=='ant') val = Math.floor(Math.random() * 20 + 80);
+                
                 const vEl = document.getElementById(k + '-val');
                 const bEl = document.getElementById(k + '-bar');
-                if(vEl) vEl.innerText = data[k] + (k=='aku'?' V':(k=='ant'?'°C':(k=='dpf'?'%':'')));
-                if(bEl) bEl.style.width = Math.min(data[k] / (k=='rpm'?50:1), 100) + "%";
+                if(vEl) vEl.innerText = val + (k=='aku'?' V':(k=='ant'?'°C':(k=='brz'?' km/h':(k=='pri'?' hPa':'%'))));
+                if(bEl) bEl.style.width = Math.min(val / (k=='rpm'?50:1), 100) + "%";
             });
         }
 
         function startScan() {
             const list = document.getElementById('err-list');
-            list.innerHTML = '<p style="text-align:center; color:var(--primary); font-family:Orbitron; margin-top:50px;">PRISTUPANJE DTC MEMORIJI...</p>';
+            list.innerHTML = '<p style="text-align:center; color:var(--primary); font-family:Orbitron; margin-top:50px;">SKENIRANJE...</p>';
             setTimeout(() => {
                 list.innerHTML = `
                     <div class="error-item">
                         <div class="error-code">P0420</div>
-                        <div class="error-desc">Efikasnost katalizatora ispod praga. Proveriti sondu 2 ili zapušenost izduva.</div>
-                    </div>
-                    <div class="error-item">
-                        <div class="error-code">P0101</div>
-                        <div class="error-desc">MAF Senzor (Protokomer): Netačan signal. Proveriti usis i konektor.</div>
-                    </div>
-                `;
+                        <div class="error-desc">Efikasnost katalizatora niska. Proveriti lambda sondu.</div>
+                    </div>`;
             }, 1500);
         }
 
         function clearScan() {
             const list = document.getElementById('err-list');
-            list.innerHTML = '<p style="text-align:center; color:var(--danger); font-family:Orbitron; margin-top:50px;">BRISANJE... MOLIMO SAČEKAJTE</p>';
+            list.innerHTML = '<p style="text-align:center; color:var(--danger); font-family:Orbitron; margin-top:50px;">BRISANJE...</p>';
             setTimeout(() => {
-                list.innerHTML = '<p style="text-align:center; color:var(--safe); margin-top:50px; font-family:Orbitron;">DTC MEMORIJA OČIŠĆENA</p>';
+                list.innerHTML = '<p style="text-align:center; color:var(--safe); margin-top:50px; font-family:Orbitron;">SISTEM ČIST</p>';
             }, 2000);
         }
 
         function showInfo(title) {
-            const modal = document.getElementById('modal');
             document.getElementById('m-title').innerText = title;
-            document.getElementById('m-body').innerHTML = `
-                <b>Idealno:</b> 13.8V - 14.4V<br>
-                <b>Problem:</b> Ako je ispod 13V, alternator ne puni.<br><br>
-                <b>Mogući kvarovi:</b> Regler, četkice alternatora ili loš akumulator.
-            `;
-            modal.style.display = 'flex';
+            document.getElementById('m-body').innerHTML = expertDb[title] || "Detaljni senzorski podaci iz ECU jedinice vozila.";
+            document.getElementById('modal').style.display = 'flex';
         }
     </script>
 </body>
