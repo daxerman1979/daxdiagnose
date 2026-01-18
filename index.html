@@ -2,8 +2,8 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,12 +18,18 @@
             --bg-color: #010101; --card-bg: #0a0a0a; --primary: #00d2ff;
             --safe: #00ff88; --danger: #ff1111;
         }
-        body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: #fff; font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
+        body, html { 
+            margin: 0; padding: 0; background-color: var(--bg-color); 
+            color: #fff; font-family: 'Roboto', sans-serif; 
+            height: 100vh; width: 100vw; overflow: hidden; 
+            user-select: none; /* Sprečava selektovanje teksta kao u pravoj aplikaciji */
+        }
 
         header { 
-            position: fixed; top: 0; width: 100%; height: 50px; background: #000; 
+            position: fixed; top: 0; width: 100%; height: 60px; background: #000; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            z-index: 100; border-bottom: 1px solid #1a1a1a; 
+            z-index: 100; border-bottom: 1px solid #1a1a1a;
+            padding-top: env(safe-area-inset-top); /* Za iPhone sa notch-om */
         }
         .header-title { font-family: 'Orbitron'; font-size: 11px; color: var(--primary); letter-spacing: 1px; text-shadow: 0 0 5px var(--primary); }
         #car-info { font-size: 9px; font-weight: bold; color: #888; text-transform: uppercase; margin-top: 1px; }
@@ -31,7 +37,7 @@
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.6s ease-in-out; }
         .btn-main { padding: 15px 30px; border-radius: 6px; background: none; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-weight: 800; cursor: pointer; width: 80%; margin: 8px; font-size: 12px; }
 
-        .page { display: none; position: absolute; top: 50px; bottom: 65px; width: 100%; padding: 6px; flex-direction: column; }
+        .page { display: none; position: absolute; top: 60px; bottom: 65px; width: 100%; padding: 6px; flex-direction: column; }
         .page.active { display: flex; }
 
         .card { 
@@ -39,10 +45,10 @@
             padding: 10px; margin-bottom: 6px; cursor: pointer;
             transition: all 0.4s ease;
         }
-        
+
         .status-safe { border-color: var(--safe) !important; box-shadow: 0 0 10px rgba(0, 255, 136, 0.1) !important; }
         .status-danger { border-color: var(--danger) !important; box-shadow: 0 0 15px rgba(255, 17, 17, 0.25) !important; }
-        
+
         .main-val { font-family: 'Orbitron'; font-size: 38px; text-align: center; font-weight: 900; line-height: 1; }
         .safe-text { color: var(--safe); text-shadow: 0 0 12px var(--safe); }
         .danger-text { color: var(--danger); text-shadow: 0 0 15px var(--danger); }
@@ -54,7 +60,7 @@
         .bar-bg { width: 100%; height: 3px; background: #111; margin-top: 6px; border-radius: 2px; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease; }
 
-        nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; border-top: 1px solid #1a1a1a; z-index: 1000; }
+        nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; border-top: 1px solid #1a1a1a; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 12px; font-weight: 800; color: #333; }
         .nav-item.active { color: var(--primary); text-shadow: 0 0 8px var(--primary); }
 
@@ -109,6 +115,13 @@
     </div>
 
     <script>
+        // REGISTRACIJA SERVICE WORKERA (Za uklanjanje adrese)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(() => {
+                console.log("Aplikacija spremna za instalaciju.");
+            });
+        }
+
         const sensorDb = [
             { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: '<b>Idealno:</b> Ispod 40%.' },
             { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: '<b>Idealno:</b> 90°C.' },
@@ -133,7 +146,6 @@
 
         async function requestBluetooth() {
             try {
-                // FILTERI VRAĆENI SAMO ZA ADAPTERE
                 const device = await navigator.bluetooth.requestDevice({
                     filters: [
                         { namePrefix: 'OBD' }, { namePrefix: 'V-LINK' }, 
