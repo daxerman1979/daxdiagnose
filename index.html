@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
 
-    <title>DAX CAR SCAN</title>
+    <title>DAX DIAGNOSE v11.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -18,18 +18,13 @@
             --bg-color: #010101; --card-bg: #0a0a0a; --primary: #00d2ff;
             --safe: #00ff88; --danger: #ff1111;
         }
-        body, html { 
-            margin: 0; padding: 0; background-color: var(--bg-color); 
-            color: #fff; font-family: 'Roboto', sans-serif; 
-            height: 100vh; width: 100vw; overflow: hidden; 
-            user-select: none; /* Sprečava selektovanje teksta kao u pravoj aplikaciji */
-        }
+        body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: #fff; font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; user-select: none; }
 
         header { 
             position: fixed; top: 0; width: 100%; height: 60px; background: #000; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             z-index: 100; border-bottom: 1px solid #1a1a1a;
-            padding-top: env(safe-area-inset-top); /* Za iPhone sa notch-om */
+            padding-top: env(safe-area-inset-top);
         }
         .header-title { font-family: 'Orbitron'; font-size: 11px; color: var(--primary); letter-spacing: 1px; text-shadow: 0 0 5px var(--primary); }
         #car-info { font-size: 9px; font-weight: bold; color: #888; text-transform: uppercase; margin-top: 1px; }
@@ -42,22 +37,26 @@
 
         .card { 
             background: var(--card-bg); border-radius: 10px; border: 1px solid #1a1a1a; 
-            padding: 10px; margin-bottom: 6px; cursor: pointer;
+            padding: 12px; margin-bottom: 6px; cursor: pointer;
             transition: all 0.4s ease;
         }
 
         .status-safe { border-color: var(--safe) !important; box-shadow: 0 0 10px rgba(0, 255, 136, 0.1) !important; }
         .status-danger { border-color: var(--danger) !important; box-shadow: 0 0 15px rgba(255, 17, 17, 0.25) !important; }
 
-        .main-val { font-family: 'Orbitron'; font-size: 38px; text-align: center; font-weight: 900; line-height: 1; }
+        /* Glavni napon akumulatora - uvećan */
+        .main-val { font-family: 'Orbitron'; font-size: 44px; text-align: center; font-weight: 900; line-height: 1.1; }
+        
         .safe-text { color: var(--safe); text-shadow: 0 0 12px var(--safe); }
         .danger-text { color: var(--danger); text-shadow: 0 0 15px var(--danger); }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex-grow: 1; }
-        .card-label { font-size: 9px; color: #777; text-transform: uppercase; font-weight: 900; margin-bottom: 3px; }
-        .card-val { font-family: 'Orbitron'; font-size: 20px; text-align: center; font-weight: 800; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-grow: 1; }
+        
+        /* POVEĆANI NATPISI NA KARTICAMA */
+        .card-label { font-size: 13px; color: #bbb; text-transform: uppercase; font-weight: 900; margin-bottom: 5px; }
+        .card-val { font-family: 'Orbitron'; font-size: 26px; text-align: center; font-weight: 800; }
 
-        .bar-bg { width: 100%; height: 3px; background: #111; margin-top: 6px; border-radius: 2px; }
+        .bar-bg { width: 100%; height: 4px; background: #111; margin-top: 8px; border-radius: 2px; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease; }
 
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; border-top: 1px solid #1a1a1a; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
@@ -72,13 +71,13 @@
 <body>
 
     <div id="splash">
-        <h1 style="font-family:Orbitron; color:var(--primary); font-size:18px;">DAX CAR SCAN</h1>
+        <h1 style="font-family:Orbitron; color:var(--primary); font-size:18px;">DAX DIAGNOSTIKA</h1>
         <button class="btn-main" onclick="requestBluetooth()">POVEŽI ADAPTER</button>
         <button class="btn-main" style="border-color:#333; color:#555;" onclick="startMode('DEMO', 'AUDI A4 B8', 'WA1ZZZ8K8XXXXXXX')">SIMULACIJA</button>
     </div>
 
     <header>
-        <div class="header-title">DAX CAR SCAN</div>
+        <div class="header-title">DAX PRO MONITOR</div>
         <div id="car-info">VOZILO: NIJE DETEKTOVANO</div>
     </header>
 
@@ -115,10 +114,9 @@
     </div>
 
     <script>
-        // REGISTRACIJA SERVICE WORKERA (Za uklanjanje adrese)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').then(() => {
-                console.log("Aplikacija spremna za instalaciju.");
+                console.log("Aplikacija spremna.");
             });
         }
 
@@ -154,7 +152,7 @@
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
                 startMode('UŽIVO', 'AUDI A4 B8', 'WA1ZZZ8K8BXXXXXXX');
-            } catch (e) { alert("Povezivanje prekinuto ili uređaj nije pronađen."); }
+            } catch (e) { alert("Povezivanje prekinuto."); }
         }
 
         function startMode(status, model, vin) {
