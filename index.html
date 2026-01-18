@@ -32,35 +32,39 @@
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.6s ease-in-out; }
         .btn-main { padding: 15px 30px; border-radius: 6px; background: none; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-weight: 800; cursor: pointer; width: 80%; margin: 8px; font-size: 12px; }
 
-        .page { display: none; position: absolute; top: 60px; bottom: 65px; width: 100%; padding: 8px; flex-direction: column; overflow-y: auto; }
+        .page { display: none; position: absolute; top: 60px; bottom: 65px; width: 100%; padding: 8px; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .page.active { display: flex; }
 
+        /* FIKSIRANA VISINA KARTICA DA NE BI SKAKALE */
         .card { 
             background: var(--card-bg); border-radius: 12px; border: 1px solid #1a1a1a; 
             padding: 12px 12px 0 12px; margin-bottom: 8px; cursor: pointer;
-            transition: all 0.4s ease; overflow: hidden; position: relative;
+            transition: border-color 0.4s ease, box-shadow 0.4s ease; 
+            overflow: hidden; position: relative;
+            min-height: 110px; /* Osigurava da su sve kartice uvek iste visine */
+            flex-shrink: 0; /* Sprečava sabijanje kartica */
+            display: flex;
+            flex-direction: column;
         }
 
         .status-safe { border-color: var(--safe) !important; box-shadow: 0 0 10px rgba(0, 255, 136, 0.05) !important; }
         .status-danger { border-color: var(--danger) !important; box-shadow: 0 0 15px rgba(255, 17, 17, 0.2) !important; }
 
-        /* VELIKI BROJEVI ZA SVE */
         .main-val, .card-val { 
             font-family: 'Orbitron'; font-size: 32px; text-align: center; font-weight: 900; 
-            line-height: 1.2; margin: 10px 0 15px 0; 
+            line-height: 1.2; margin: auto 0; /* Centriranje vrednosti u sredinu kartice */
         }
-        #aku-val { font-size: 46px; } /* Akumulator ostaje najveći */
+        #aku-val { font-size: 46px; } 
         
         .safe-text { color: var(--safe); text-shadow: 0 0 10px var(--safe); }
         .danger-text { color: var(--danger); text-shadow: 0 0 15px var(--danger); }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex-shrink: 0; }
         
-        /* POVEĆANI NASLOVI KARTICA */
         .card-label { font-size: 11px; color: #ddd; text-transform: uppercase; font-weight: 900; letter-spacing: 0.5px; }
 
-        /* BAROVI NA SAMOM DNU KARTICE */
-        .bar-bg { width: calc(100% + 24px); height: 6px; background: #111; margin-left: -12px; margin-top: auto; position: relative; bottom: 0; }
+        /* BAROVI FIKSIRANI NA DNU */
+        .bar-bg { width: calc(100% + 24px); height: 6px; background: #111; margin-left: -12px; margin-top: auto; position: relative; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease; }
 
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; border-top: 1px solid #1a1a1a; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
@@ -111,7 +115,7 @@
     <div id="modal" onclick="this.style.display='none'">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h2 id="m-title" style="color:var(--primary); font-family:Orbitron; margin:0 0 10px 0; font-size:16px; border-bottom: 1px solid #222; padding-bottom:5px;"></h2>
-            <div id="m-body"></div>
+            <div id="m-body" style="color:#ccc; font-size:14px; line-height:1.4;"></div>
             <button class="btn-main" style="width:100%; margin-top:15px; background:var(--primary); color:#000; border:none;" onclick="document.getElementById('modal').style.display='none'">ZATVORI</button>
         </div>
     </div>
@@ -122,14 +126,14 @@
         }
 
         const sensorDb = [
-            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: 'Ispod 40% je idealno.' },
-            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: 'Radna temp je 90°C.' },
-            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800, info: 'Broj obrtaja motora.' },
-            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135, info: 'Brzina kretanja.' },
-            { id: 'load', label: '📊 Opterećenje', unit: '%', min: 0, max: 80, info: 'Opterećenje motora.' },
-            { id: 'iat', label: '❄️ Usis Vazduha', unit: '°C', min: 5, max: 55, info: 'Temperatura usisa.' },
-            { id: 'egr', label: '♻️ EGR Temp', unit: '°C', min: 120, max: 450, info: 'Temperatura EGR.' },
-            { id: 'pri', label: '⏲️ Difer. Pri.', unit: ' hPa', min: 0, max: 40, info: 'Pritisak DPF filtera.' }
+            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: 'Idealno: Ispod 40%.' },
+            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: 'Radna temperatura je oko 90°C.' },
+            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800, info: 'Broj obrtaja motora u minuti.' },
+            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135, info: 'Trenutna brzina vozila.' },
+            { id: 'load', label: '📊 Opterećenje', unit: '%', min: 0, max: 80, info: 'Procentualno opterećenje motora.' },
+            { id: 'iat', label: '❄️ Usis Vazduha', unit: '°C', min: 5, max: 55, info: 'Temperatura vazduha na usisu.' },
+            { id: 'egr', label: '♻️ EGR Temp', unit: '°C', min: 120, max: 450, info: 'Temperatura izduvnih gasova u EGR.' },
+            { id: 'pri', label: '⏲️ Difer. Pri.', unit: ' hPa', min: 0, max: 40, info: 'Diferencijalni pritisak DPF filtera.' }
         ];
 
         function init() {
@@ -150,7 +154,7 @@
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
                 startMode('UŽIVO', 'AUDI A4 B8', 'WA1ZZZ8K8BXXXXXXX');
-            } catch (e) { alert("Greška pri povezivanju."); }
+            } catch (e) { alert("Povezivanje prekinuto."); }
         }
 
         function startMode(status, model, vin) {
@@ -173,6 +177,7 @@
             const cEl = document.getElementById('card-' + id);
             const bEl = document.getElementById(id + '-bar');
             let unit = (id === 'aku') ? ' V' : (sensorDb.find(s => s.id === id)?.unit || '');
+            
             vEl.innerText = val + unit;
             let isSafe = val >= min && val <= max;
             if(id === 'brz' || id === 'rpm') isSafe = true;
@@ -184,8 +189,9 @@
         }
 
         function showInfo(label) {
-            let data = (label === 'NAPON AKUMULATORA') ? { label: 'Akumulator', info: 'Idealno: 13.8V - 14.4V' } : sensorDb.find(s => s.label === label);
+            let data = (label === 'NAPON AKUMULATORA') ? { label: 'Akumulator', info: 'Normalan napon u radu je između 13.8V i 14.4V.' } : sensorDb.find(s => s.label === label);
             document.getElementById('m-title').innerText = data.label;
+            document.getElementById('m-body').innerText = data.info;
             document.getElementById('modal').style.display = 'flex';
         }
 
@@ -196,8 +202,9 @@
             document.getElementById('nav-'+t).classList.add('active');
         }
 
-        function doScan() { alert("Skeniranje ECU..."); }
-        function doClear() { alert("Brisanje grešaka..."); }
+        function doScan() { alert("Skeniranje u toku..."); }
+        function doClear() { alert("Greške obrisane."); }
+        
         init();
     </script>
 </body>
