@@ -3,111 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DAX PRO v17</title>
+    <title>DAX PRO v18</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto:wght@900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
             --bg-color: #000; --primary: #00d2ff;
-            --safe-glow: rgba(0, 255, 136, 0.08); 
-            --danger-glow: rgba(255, 17, 17, 0.15);
             --safe: #00ff88; --danger: #ff1111;
+            --card-bg: #0a0a0a;
         }
         body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: #fff; font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
 
         header { 
-            position: fixed; top: 0; width: 100%; height: 55px; background: rgba(0,0,0,0.95); 
+            position: fixed; top: 0; width: 100%; height: 50px; background: rgba(0,0,0,0.9); 
             display: flex; align-items: center; justify-content: center; z-index: 100;
             border-bottom: 1px solid #1a1a1a;
         }
-        .header-title { font-family: 'Orbitron'; font-size: 14px; color: var(--primary); letter-spacing: 5px; font-weight: 900; }
+        .header-title { font-family: 'Orbitron'; font-size: 13px; color: var(--primary); letter-spacing: 3px; font-weight: 900; }
 
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: 0.6s ease; }
-        .btn-main { padding: 18px; border-radius: 12px; background: #050505; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-size: 12px; cursor: pointer; width: 85%; margin: 10px; }
+        .btn-start { padding: 20px 40px; border-radius: 50px; background: none; border: 2px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-size: 14px; cursor: pointer; box-shadow: 0 0 20px rgba(0,210,255,0.2); }
 
-        #view-slider { display: flex; width: 200vw; height: 100vh; transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
-        .page { width: 100vw; height: 100vh; padding: 65px 12px 20px 12px; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        /* SLIDER SISTEM */
+        #view-slider { display: flex; width: 200vw; height: 100vh; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        .page { width: 100vw; height: 100vh; padding: 60px 15px 80px 15px; flex-shrink: 0; overflow-y: auto; position: relative; }
 
-        /* AMBIENT KARTICE */
+        /* KARTICE SENZORA */
         .card { 
-            background: #0a0a0a; border-radius: 20px; border: 1px solid #151515; 
-            padding: 20px; margin-bottom: 15px; display: flex; align-items: center;
-            position: relative; overflow: hidden; transition: all 0.6s ease;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            background: var(--card-bg); border-radius: 20px; border: 1px solid #151515; 
+            padding: 18px; margin-bottom: 12px; display: flex; align-items: center;
+            transition: all 0.5s ease; position: relative;
         }
-
-        .card-icon { font-size: 32px; width: 60px; flex-shrink: 0; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
-        
+        .card-icon { font-size: 28px; width: 50px; }
         .card-info { flex-grow: 1; }
-        .card-label { font-size: 11px; color: #555; text-transform: uppercase; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 5px; }
+        .card-label { font-size: 10px; color: #444; text-transform: uppercase; font-weight: 900; margin-bottom: 2px; }
+        .val-group { display: flex; align-items: baseline; gap: 4px; }
+        .card-val { font-family: 'Orbitron'; font-size: 40px; font-weight: 900; transition: 0.3s; }
+        .card-unit { font-family: 'Orbitron'; font-size: 12px; color: #333; font-weight: 700; }
+
+        /* AMBIENT BOJE */
+        .card.safe { border-color: rgba(0,255,136,0.15); background: linear-gradient(145deg, #0a0a0a, #061006); }
+        .card.safe .card-val { color: var(--safe); text-shadow: 0 0 15px rgba(0,255,136,0.2); }
+        .card.danger { border-color: rgba(255,17,17,0.25); background: linear-gradient(145deg, #100606, #0a0a0a); }
+        .card.danger .card-val { color: var(--danger); text-shadow: 0 0 20px rgba(255,17,17,0.3); }
+
+        /* DIJAGNOSTIKA MOD */
+        .diag-header { text-align: center; margin-bottom: 20px; }
+        .diag-status-hex { 
+            width: 100px; height: 100px; margin: 0 auto 20px; border: 2px solid #222; 
+            display: flex; align-items: center; justify-content: center; font-family: 'Orbitron';
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: #050505; transition: 0.3s;
+        }
+        .diag-status-hex.active { border-color: var(--primary); box-shadow: 0 0 20px var(--primary); color: var(--primary); }
         
-        /* Vrednost i jedinica */
-        .val-container { display: flex; align-items: baseline; gap: 5px; }
-        .card-val { font-family: 'Orbitron'; font-size: 44px; font-weight: 900; line-height: 1; transition: color 0.4s ease; }
-        .card-unit { font-family: 'Orbitron'; font-size: 14px; font-weight: 700; color: #444; text-transform: uppercase; }
+        #log-container { min-height: 200px; }
+        .error-log-card { 
+            background: #0d0d0d; border-radius: 12px; padding: 15px; margin-bottom: 10px;
+            border-left: 4px solid var(--danger); animation: fadeIn 0.3s ease forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* STANJA BOJA */
-        .card.safe { background: linear-gradient(145deg, #0a0a0a, #051505); border-color: rgba(0, 255, 136, 0.2); }
-        .card.safe .card-val { color: var(--safe); text-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
-        .card.safe .card-unit { color: rgba(0, 255, 136, 0.5); }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-diag { 
+            flex: 1; padding: 15px; border-radius: 12px; font-family: 'Orbitron'; font-size: 10px; 
+            font-weight: 900; cursor: pointer; border: 1px solid #222; background: #111; color: #eee;
+        }
+        .btn-diag.primary { border-color: var(--primary); color: var(--primary); }
+        .btn-diag.clear { border-color: var(--danger); color: var(--danger); }
 
-        .card.danger { background: linear-gradient(145deg, #150505, #0a0a0a); border-color: rgba(255, 17, 17, 0.3); }
-        .card.danger .card-val { color: var(--danger); text-shadow: 0 0 20px rgba(255, 17, 17, 0.4); }
-        .card.danger .card-unit { color: rgba(255, 17, 17, 0.5); }
-
-        /* DIJAGNOSTIKA */
-        #page-greske { background: #000; text-align: center; }
-        .diag-btn { width: 120px; height: 120px; border-radius: 50%; border: 2px solid var(--primary); margin: 50px auto; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 12px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 20px rgba(0,210,255,0.1); }
-        .err-log { padding: 10px; text-align: left; }
-        .err-card { background: #110505; border: 1px solid #311; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--danger); }
+        /* PAGINATION INDICATOR */
+        .nav-dots { 
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
+            display: flex; gap: 10px; z-index: 200;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #222; transition: 0.3s; }
+        .dot.active { background: var(--primary); box-shadow: 0 0 10px var(--primary); width: 20px; border-radius: 10px; }
     </style>
 </head>
-<body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)">
+<body ontouchstart="handleTS(event)" ontouchmove="handleTM(event)">
 
     <div id="splash">
-        <h1 style="font-family:Orbitron; color:var(--primary); font-size:28px; letter-spacing:2px;">DAX PRO</h1>
-        <p style="color:#222; font-family:Orbitron; font-size:10px; margin-bottom:40px;">AMBIENT MONITORING v17</p>
-        <button class="btn-main" onclick="startMode()">POKRENI SISTEM</button>
+        <h1 style="font-family:Orbitron; color:var(--primary); font-size:32px; margin-bottom:40px;">DAX PRO</h1>
+        <button class="btn-start" onclick="startApp()">START MONITOR</button>
     </div>
 
     <header>
-        <div class="header-title">SYSTEM STATUS</div>
+        <div class="header-title" id="mode-title">LIVE TELEMETRY</div>
     </header>
 
     <div id="view-slider">
         <div id="page-podaci" class="page">
             <div id="main-list"></div>
-            <p style="text-align:center; color:#222; font-size:9px; font-family:Orbitron; margin-top:20px;">POVRECI LEVO ZA SKENIRANJE</p>
         </div>
 
         <div id="page-greske" class="page">
-            <div class="diag-btn" id="diag-btn" onclick="runDiagnostic()">SCAN</div>
-            <div id="error-output" class="err-log"></div>
+            <div class="diag-header">
+                <div class="diag-status-hex" id="status-hex">READY</div>
+                <p style="font-size:10px; color:#444; font-family:Orbitron;">ECU DIAGNOSTIC UNIT</p>
+            </div>
+            
+            <div id="log-container">
+                <p style="text-align:center; color:#222; margin-top:50px; font-family:Orbitron; font-size:11px;">NO ACTIVE SCAN</p>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-diag primary" onclick="startScan()">RUN SCAN</button>
+                <button class="btn-diag clear" onclick="clearErrors()">CLEAR DTC</button>
+            </div>
         </div>
     </div>
 
-    <script>
-        let touchstartX = 0;
-        let touchendX = 0;
+    <div class="nav-dots">
+        <div id="dot1" class="dot active"></div>
+        <div id="dot2" class="dot"></div>
+    </div>
 
-        function handleTouchStart(e) { touchstartX = e.changedTouches[0].screenX; }
-        function handleTouchMove(e) {
-            touchendX = e.changedTouches[0].screenX;
-            const slider = document.getElementById('view-slider');
-            if (Math.abs(touchstartX - touchendX) > 80) {
-                if (touchstartX - touchendX > 0) slider.style.transform = "translateX(-100vw)";
-                else slider.style.transform = "translateX(0)";
+    <script>
+        let tsX = 0;
+        let activePage = 0;
+
+        function handleTS(e) { tsX = e.touches[0].clientX; }
+        function handleTM(e) {
+            let moveX = e.touches[0].clientX;
+            let diff = tsX - moveX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) switchPage(1);
+                else switchPage(0);
             }
         }
 
+        function switchPage(idx) {
+            activePage = idx;
+            const slider = document.getElementById('view-slider');
+            const title = document.getElementById('mode-title');
+            slider.style.transform = `translateX(-${idx * 100}vw)`;
+            
+            document.getElementById('dot1').className = idx === 0 ? 'dot active' : 'dot';
+            document.getElementById('dot2').className = idx === 1 ? 'dot active' : 'dot';
+            title.innerText = idx === 0 ? "LIVE TELEMETRY" : "DIAGNOSTIC MODE";
+        }
+
         const sensorDb = [
-            { id: 'aku', label: 'Akumulator', unit: 'V', min: 13.0, max: 14.8, icon: '🔋' },
-            { id: 'dpf', label: 'DPF Čađ', unit: '%', min: 0, max: 70, icon: '💨' },
-            { id: 'ant', label: 'Antifriz', unit: '°C', min: 80, max: 100, icon: '🌡️' },
-            { id: 'rpm', label: 'Obrtaji', unit: 'RPM', min: 0, max: 3500, icon: '⚙️' },
-            { id: 'brz', label: 'Brzina', unit: 'km/h', min: 0, max: 140, icon: '🚀' },
-            { id: 'load', label: 'Opterećenje', unit: '%', min: 0, max: 80, icon: '📊' },
-            { id: 'iat', label: 'Usis Vazduha', unit: '°C', min: 10, max: 50, icon: '❄️' }
+            { id: 'aku', label: 'Battery', unit: 'V', min: 13.0, max: 14.8, icon: '🔋' },
+            { id: 'ant', label: 'Coolant', unit: '°C', min: 80, max: 105, icon: '🌡️' },
+            { id: 'rpm', label: 'Engine', unit: 'RPM', min: 0, max: 4000, icon: '⚙️' },
+            { id: 'dpf', label: 'DPF Soot', unit: '%', min: 0, max: 80, icon: '💨' },
+            { id: 'brz', label: 'Speed', unit: 'KMH', min: 0, max: 160, icon: '🚀' }
         ];
 
         function init() {
@@ -117,7 +159,7 @@
                     <div class="card-icon">${s.icon}</div>
                     <div class="card-info">
                         <div class="card-label">${s.label}</div>
-                        <div class="val-container">
+                        <div class="val-group">
                             <span id="${s.id}-val" class="card-val">--</span>
                             <span class="card-unit">${s.unit}</span>
                         </div>
@@ -126,35 +168,54 @@
             `).join('');
         }
 
-        function runDiagnostic() {
-            const btn = document.getElementById('diag-btn');
-            const out = document.getElementById('error-output');
-            btn.innerText = "...";
-            out.innerHTML = "<p style='text-align:center; color:#444;'>PRISTUP ECU MODULU...</p>";
-            
+        function startScan() {
+            const container = document.getElementById('log-container');
+            const hex = document.getElementById('status-hex');
+            hex.className = "diag-status-hex active";
+            hex.innerText = "SCAN";
+            container.innerHTML = "<p style='text-align:center; color:var(--primary); font-family:Orbitron;'>SCANNING ECU...</p>";
+
             setTimeout(() => {
-                btn.innerText = "RESET";
-                btn.style.borderColor = "red";
-                out.innerHTML = `
-                    <div class="err-card">
+                hex.innerText = "FOUND";
+                hex.style.color = "red";
+                hex.style.borderColor = "red";
+                container.innerHTML = `
+                    <div class="error-log-card">
                         <b style="color:red; font-family:Orbitron;">P0420</b><br>
-                        <span style="font-size:11px; color:#666;">Catalyst Efficiency Below Threshold</span>
+                        <span style="font-size:11px; color:#555;">Catalyst System Efficiency Below Threshold (Bank 1)</span>
+                    </div>
+                    <div class="error-log-card">
+                        <b style="color:red; font-family:Orbitron;">P0101</b><br>
+                        <span style="font-size:11px; color:#555;">Mass or Volume Air Flow Circuit Range Performance</span>
                     </div>
                 `;
             }, 2000);
         }
 
-        function startMode() {
-            document.getElementById('splash').style.transform = "translateY(-100%)";
-            setInterval(updateAll, 1000);
+        function clearErrors() {
+            const container = document.getElementById('log-container');
+            const hex = document.getElementById('status-hex');
+            container.innerHTML = "<p style='text-align:center; color:var(--danger); font-family:Orbitron;'>CLEARING DTC MEMORY...</p>";
+            
+            setTimeout(() => {
+                hex.className = "diag-status-hex";
+                hex.innerText = "CLEAN";
+                hex.style.color = "var(--safe)";
+                hex.style.borderColor = "var(--safe)";
+                container.innerHTML = "<p style='text-align:center; color:var(--safe); font-family:Orbitron; margin-top:50px;'>NO FAULT CODES FOUND</p>";
+            }, 1500);
         }
 
-        function updateAll() {
+        function startApp() {
+            document.getElementById('splash').style.transform = "translateY(-100%)";
+            setInterval(updateSensors, 1000);
+        }
+
+        function updateSensors() {
             sensorDb.forEach(s => {
-                let val = (s.id === 'aku') ? (Math.random() * 1.0 + 13.0).toFixed(1) : Math.floor(Math.random() * (s.max * 1.2));
+                let val = (s.id === 'aku') ? (Math.random() * 0.8 + 13.5).toFixed(1) : Math.floor(Math.random() * (s.max * 1.1));
                 const vEl = document.getElementById(s.id + '-val');
                 const cEl = document.getElementById('card-' + s.id);
-
                 let isSafe = val >= s.min && val <= s.max;
                 if(s.id === 'brz' || s.id === 'rpm') isSafe = true;
 
