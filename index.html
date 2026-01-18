@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DAX PRO v22</title>
+    <title>DAX PRO v23</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -39,14 +39,15 @@
         .header-title { font-family: 'Orbitron'; font-size: 18px; font-weight: 900; color: #fff; letter-spacing: 2px; }
 
         #view-slider { display: flex; width: 200vw; height: 100vh; transition: transform 0.4s ease; }
-        .page { width: 100vw; height: 100vh; padding: 90px 15px 80px; flex-shrink: 0; overflow-y: auto; }
+        
+        /* POVEĆAN PADDING-TOP DA NE PREKRIVA KARTICE */
+        .page { width: 100vw; height: 100vh; padding: 100px 15px 80px; flex-shrink: 0; overflow-y: auto; }
 
         /* KARTICE SENZORA */
         .card { 
             background: #0c0c0c; border: 2px solid #222; border-radius: 20px; 
             padding: 25px; margin-bottom: 15px; display: flex; 
             justify-content: space-between; align-items: center;
-            transition: 0.3s;
         }
         .card-label { 
             font-size: 16px; color: #fff; font-weight: 900; 
@@ -59,22 +60,25 @@
             font-size: 16px; color: #fff; font-family: 'Orbitron'; font-weight: 900; margin-left: 8px;
         }
 
-        /* STANJA */
         .card.danger { border-color: var(--danger); background: #1a0000; }
         .card.danger .card-val { color: var(--danger); text-shadow: 0 0 20px var(--danger); }
         .card.safe { border-left: 8px solid var(--safe); }
 
-        /* DIJAGNOSTIKA */
+        /* DIJAGNOSTIKA - SKROLOVANJE SAMO ZA GREŠKE */
+        .diag-container { display: flex; flex-direction: column; height: 100%; }
+        
         .diag-box { 
-            width: 100%; border: 3px solid #222; border-radius: 20px; 
-            min-height: 300px; margin-bottom: 20px; padding: 20px; 
+            flex-grow: 1; border: 3px solid #222; border-radius: 20px; 
+            padding: 15px; overflow-y: scroll; /* Omogućeno skrolovanje unutar kutije */
+            background: #050505;
         }
+        
         .err-item { 
-            background: #200; border: 1px solid red; padding: 20px; 
-            border-radius: 12px; margin-bottom: 15px; 
+            background: #200; border: 1px solid red; padding: 15px; 
+            border-radius: 12px; margin-bottom: 10px; 
         }
-        .err-code { font-family: 'Orbitron'; font-size: 24px; font-weight: 900; color: red; }
-        .err-desc { color: #fff; font-weight: 900; font-size: 14px; margin-top: 5px; text-transform: uppercase; }
+        .err-code { font-family: 'Orbitron'; font-size: 20px; font-weight: 900; color: red; }
+        .err-desc { color: #fff; font-weight: 900; font-size: 13px; margin-top: 3px; text-transform: uppercase; }
 
         .nav-dots { 
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
@@ -101,10 +105,12 @@
         </div>
 
         <div class="page">
-            <div class="diag-box" id="diag-out">
-                <p style="text-align:center; color:#444; font-family:Orbitron; font-weight:900; margin-top:100px;">ČEKAM SKENIRANJE</p>
+            <div class="diag-container">
+                <div class="diag-box" id="diag-out">
+                    <p style="text-align:center; color:#444; font-family:Orbitron; font-weight:900; margin-top:100px;">ČEKAM SKENIRANJE</p>
+                </div>
+                <button class="btn-main btn-connect" id="diag-btn" onclick="runDiagnostic()" style="margin-top:15px; width:100%;">SKENIRAJ VOZILO</button>
             </div>
-            <button class="btn-main btn-connect" id="diag-btn" onclick="runDiagnostic()">SKENIRAJ VOZILO</button>
         </div>
     </div>
 
@@ -115,7 +121,6 @@
 
     <script>
         let tsX = 0, activePage = 0;
-        let isSim = false;
 
         function hTS(e) { tsX = e.touches[0].clientX; }
         function hTM(e) {
@@ -125,7 +130,7 @@
                 document.getElementById('view-slider').style.transform = `translateX(-${activePage * 100}vw)`;
                 document.getElementById('d1').className = activePage == 0 ? 'dot active' : 'dot';
                 document.getElementById('d2').className = activePage == 1 ? 'dot active' : 'dot';
-                document.getElementById('h-title').innerText = activePage == 0 ? "LIVE DATA" : "DIJAGNOSTIKA";
+                document.getElementById('h-title').innerText = activePage == 0 ? "LIVE DATA" : "DIAGNOSTIKA";
             }
         }
 
@@ -135,6 +140,20 @@
             { id: 'ant', label: 'Temperatura', unit: '°C', min: 80, max: 100 },
             { id: 'dpf', label: 'DPF Filter', unit: '%', min: 0, max: 70 },
             { id: 'brz', label: 'Brzina', unit: 'KMH', min: 0, max: 200 }
+        ];
+
+        // LISTA OD 10 GREŠAKA
+        const errorList = [
+            { code: "P0420", desc: "Efikasnost katalizatora ispod praga" },
+            { code: "P0101", desc: "MAF Senzor - problem sa opsegom" },
+            { code: "P0300", desc: "Nasumično izostajanje paljenja" },
+            { code: "P0171", desc: "Smeša previše siromašna (Bank 1)" },
+            { code: "P0401", desc: "EGR ventil - nedovoljan protok" },
+            { code: "P0113", desc: "IAT Senzor - visok ulazni napon" },
+            { code: "P0500", desc: "Senzor brzine vozila - kvar" },
+            { code: "P0234", desc: "Turbo punjač - prepunjavanje" },
+            { code: "P0606", desc: "Greška u procesoru ECU modula" },
+            { code: "P0135", desc: "Grejač lambda sonde - kvar" }
         ];
 
         function init() {
@@ -150,36 +169,28 @@
         }
 
         function startSim() {
-            isSim = true;
             document.getElementById('splash').style.transform = "translateY(-100%)";
             setInterval(updateData, 1000);
         }
 
         async function connectAdapter() {
             try {
-                // Poziv za pravi Bluetooth adapter
-                const device = await navigator.bluetooth.requestDevice({
+                await navigator.bluetooth.requestDevice({
                     filters: [{ namePrefix: 'OBD' }],
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
                 document.getElementById('splash').style.transform = "translateY(-100%)";
                 setInterval(updateData, 1000);
-            } catch (e) {
-                alert("Adapter nije pronađen. Pokrećem simulaciju.");
-                startSim();
-            }
+            } catch (e) { startSim(); }
         }
 
         function updateData() {
             sensors.forEach(s => {
                 let v = (s.id === 'aku') ? (Math.random() * 1 + 13.5).toFixed(1) : Math.floor(Math.random() * s.max);
-                const valEl = document.getElementById(s.id + '-v');
-                const cardEl = document.getElementById('card-' + s.id);
-                valEl.innerText = v;
-                
+                document.getElementById(s.id + '-v').innerText = v;
                 let safe = v >= s.min && v <= s.max;
                 if(s.id === 'brz' || s.id === 'rpm') safe = true;
-                cardEl.className = 'card ' + (safe ? 'safe' : 'danger');
+                document.getElementById('card-' + s.id).className = 'card ' + (safe ? 'safe' : 'danger');
             });
         }
 
@@ -188,19 +199,19 @@
             const btn = document.getElementById('diag-btn');
             
             if(btn.innerText.includes("SKENIRAJ")) {
-                out.innerHTML = "<p style='text-align:center; color:var(--accent); font-family:Orbitron; font-weight:900; margin-top:100px;'>KOMUNIKACIJA...</p>";
+                out.innerHTML = "<p style='text-align:center; color:var(--accent); font-family:Orbitron; font-weight:900; margin-top:50px;'>SKENIRANJE U TOKU...</p>";
                 setTimeout(() => {
-                    out.innerHTML = `
+                    out.innerHTML = errorList.map(e => `
                         <div class="err-item">
-                            <div class="err-code">P0420</div>
-                            <div class="err-desc">Efikasnost katalizatora ispod praga</div>
+                            <div class="err-code">${e.code}</div>
+                            <div class="err-desc">${e.desc}</div>
                         </div>
-                    `;
+                    `).join('');
                     btn.innerText = "OBRIŠI GREŠKE";
                     btn.style.background = "red";
-                }, 2000);
+                }, 1500);
             } else {
-                out.innerHTML = "<p style='text-align:center; color:var(--safe); font-family:Orbitron; font-weight:900; margin-top:100px;'>MEMORIJA OČIŠĆENA</p>";
+                out.innerHTML = "<p style='text-align:center; color:var(--safe); font-family:Orbitron; font-weight:900; margin-top:100px;'>SISTEM ISPRAVAN</p>";
                 btn.innerText = "SKENIRAJ VOZILO";
                 btn.style.background = "var(--accent)";
             }
