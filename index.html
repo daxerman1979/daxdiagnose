@@ -32,31 +32,33 @@
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.6s ease-in-out; }
         .btn-main { padding: 15px 30px; border-radius: 6px; background: none; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-weight: 800; cursor: pointer; width: 80%; margin: 8px; font-size: 12px; }
 
-        .page { display: none; position: absolute; top: 60px; bottom: 65px; width: 100%; padding: 6px; flex-direction: column; }
+        /* Omogućeno skrolovanje pošto su kartice sada jedna ispod druge */
+        .page { display: none; position: absolute; top: 60px; bottom: 65px; width: 100%; padding: 10px; flex-direction: column; overflow-y: auto; }
         .page.active { display: flex; }
 
+        /* SVE KARTICE IZGLEDAJU ISTO */
         .card { 
-            background: var(--card-bg); border-radius: 10px; border: 1px solid #1a1a1a; 
-            padding: 12px; margin-bottom: 6px; cursor: pointer;
+            background: var(--card-bg); border-radius: 12px; border: 1px solid #1a1a1a; 
+            padding: 15px; margin-bottom: 10px; cursor: pointer;
             transition: all 0.4s ease;
+            width: 100%;
         }
 
         .status-safe { border-color: var(--safe) !important; box-shadow: 0 0 10px rgba(0, 255, 136, 0.1) !important; }
         .status-danger { border-color: var(--danger) !important; box-shadow: 0 0 15px rgba(255, 17, 17, 0.25) !important; }
 
-        /* Glavni napon akumulatora - uvećan */
-        .main-val { font-family: 'Orbitron'; font-size: 44px; text-align: center; font-weight: 900; line-height: 1.1; }
+        /* SVE VREDNOSTI SU SADA VELIKE KAO NA AKUMULATORU */
+        .main-val, .card-val { font-family: 'Orbitron'; font-size: 40px; text-align: center; font-weight: 900; line-height: 1.1; margin: 5px 0; }
         
         .safe-text { color: var(--safe); text-shadow: 0 0 12px var(--safe); }
         .danger-text { color: var(--danger); text-shadow: 0 0 15px var(--danger); }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-grow: 1; }
+        /* GRID JE SADA SAMO JEDNA KOLONA */
+        .grid { display: flex; flex-direction: column; width: 100%; }
         
-        /* POVEĆANI NATPISI NA KARTICAMA */
         .card-label { font-size: 13px; color: #bbb; text-transform: uppercase; font-weight: 900; margin-bottom: 5px; }
-        .card-val { font-family: 'Orbitron'; font-size: 26px; text-align: center; font-weight: 800; }
 
-        .bar-bg { width: 100%; height: 4px; background: #111; margin-top: 8px; border-radius: 2px; }
+        .bar-bg { width: 100%; height: 5px; background: #111; margin-top: 10px; border-radius: 3px; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease; }
 
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; border-top: 1px solid #1a1a1a; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
