@@ -3,111 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DAX PRO v15</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Roboto:wght@900&display=swap" rel="stylesheet">
+    <title>DAX PRO v16</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto:wght@900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --bg-color: #000; --card-bg: #0d0d0d; --primary: #00d2ff;
-            --safe: #00ff88; --danger: #ff1111;
+            --bg-color: #000; --card-bg: #0a0a0a; --primary: #00d2ff;
+            --safe: #00ff88; --danger: #ff1111; --warning: #ffcc00;
         }
         body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: #fff; font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
 
         header { 
-            position: fixed; top: 0; width: 100%; height: 50px; background: rgba(0,0,0,0.8); 
+            position: fixed; top: 0; width: 100%; height: 55px; background: rgba(0,0,0,0.9); 
             display: flex; align-items: center; justify-content: center; z-index: 100;
-            backdrop-filter: blur(10px); border-bottom: 1px solid #222;
+            backdrop-filter: blur(15px); border-bottom: 1px solid #1a1a1a;
         }
-        .header-title { font-family: 'Orbitron'; font-size: 13px; color: var(--primary); letter-spacing: 4px; font-weight: 900; }
+        .header-title { font-family: 'Orbitron'; font-size: 14px; color: var(--primary); letter-spacing: 5px; font-weight: 900; }
 
-        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: 0.5s; }
-        .btn-main { padding: 15px; border-radius: 10px; background: #111; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-size: 12px; cursor: pointer; width: 80%; margin: 10px; box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); }
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-main { padding: 18px; border-radius: 12px; background: #050505; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-size: 12px; cursor: pointer; width: 85%; margin: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 
         #view-slider { display: flex; width: 200vw; height: 100vh; transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
-        .page { width: 100vw; height: 100vh; padding: 60px 10px 10px 10px; flex-shrink: 0; display: flex; flex-direction: column; }
+        .page { width: 100vw; height: 100vh; padding: 65px 12px 20px 12px; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
-        /* DINAMIČKE KARTICE KOJE POPUNJAVAJU EKRAN */
-        .card-container { display: flex; flex-direction: column; flex-grow: 1; gap: 8px; }
-        
-        #card-aku { 
-            flex: 1.2; background: linear-gradient(135deg, #111 0%, #050505 100%);
-            border-radius: 15px; border: 1px solid #222;
-            display: flex; flex-direction: column; justify-content: space-between; padding: 12px; overflow: hidden;
-        }
-        
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 4; }
-
+        /* HORIZONTALNE KARTICE */
         .card { 
-            background: var(--card-bg); border-radius: 12px; border: 1px solid #1a1a1a; 
-            padding: 10px 10px 0 10px; display: flex; flex-direction: column; 
-            justify-content: space-between; overflow: hidden; position: relative;
+            background: var(--card-bg); border-radius: 16px; border: 1px solid #151515; 
+            padding: 15px; margin-bottom: 12px; display: flex; align-items: center;
+            position: relative; overflow: hidden; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
-        .main-val { font-family: 'Orbitron'; font-size: clamp(30px, 10vw, 44px); text-align: center; font-weight: 900; }
-        .card-val { font-family: 'Orbitron'; font-size: clamp(20px, 7vw, 28px); text-align: center; font-weight: 900; }
+        .card-icon { font-size: 28px; width: 50px; flex-shrink: 0; text-align: center; }
         
-        .safe-text { color: var(--safe); text-shadow: 0 0 15px var(--safe); }
-        .danger-text { color: var(--danger); text-shadow: 0 0 15px var(--danger); }
+        .card-info { flex-grow: 1; padding-left: 15px; }
+        .card-label { font-size: 10px; color: #555; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
         
-        .card-label { font-size: 10px; color: #888; text-transform: uppercase; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+        .card-val { font-family: 'Orbitron'; font-size: 38px; font-weight: 900; line-height: 1; margin-top: 5px; transition: 0.3s; }
+        
+        .card-visual { width: 80px; height: 40px; display: flex; align-items: flex-end; gap: 3px; padding-bottom: 5px; }
+        .vis-bar { width: 6px; background: #111; border-radius: 3px; transition: height 0.5s ease, background 0.5s ease; }
 
-        .bar-bg { width: calc(100% + 20px); height: 5px; background: #111; margin-left: -10px; }
-        .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease; }
+        /* BOJE */
+        .safe-text { color: var(--safe); text-shadow: 0 0 15px rgba(0,255,136,0.4); }
+        .danger-text { color: var(--danger); text-shadow: 0 0 15px rgba(255,17,17,0.4); }
 
-        /* DIJAGNOSTIKA - ATRAKTIVNA ANIMACIJA */
-        #page-greske { background: radial-gradient(circle, #1a0000 0%, #000 100%); align-items: center; justify-content: center; }
-        
-        .scanner-hex {
-            width: 120px; height: 120px; background: rgba(0, 210, 255, 0.05);
-            border: 2px solid var(--primary); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            display: flex; align-items: center; justify-content: center;
-            animation: pulse-hex 2s infinite; position: relative; margin-bottom: 20px;
+        /* DIJAGNOSTIKA PAGE */
+        #page-greske { background: #000; padding-top: 80px; }
+        .scan-container { text-align: center; padding: 20px; }
+        .radar { 
+            width: 150px; height: 150px; border: 2px solid #111; border-radius: 50%; margin: 0 auto 30px;
+            position: relative; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle, #050505 0%, #000 100%);
         }
-        @keyframes pulse-hex {
-            0% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 30px var(--primary); }
-            100% { transform: scale(1); opacity: 0.5; }
+        .radar-line { 
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            border-top: 3px solid var(--primary); animation: rotate 2s linear infinite; display: none;
         }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        #err-log { width: 100%; max-height: 50%; overflow-y: auto; padding: 10px; font-family: 'Orbitron'; }
-        .log-entry { font-size: 10px; color: #00ff88; margin-bottom: 5px; border-left: 2px solid #00ff88; padding-left: 10px; animation: type 0.2s ease-out; }
-        @keyframes type { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .err-item { 
+            background: #080000; border: 1px solid #200; padding: 15px; border-radius: 12px; 
+            margin-bottom: 10px; text-align: left; border-left: 4px solid var(--danger);
+            animation: slideUp 0.4s ease forwards;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .hint-swipe { font-family: 'Orbitron'; font-size: 8px; color: #222; letter-spacing: 3px; margin-top: auto; padding-bottom: 10px; text-align: center; }
+        .hint-text { font-family: 'Orbitron'; font-size: 9px; color: #333; text-align: center; margin-top: 20px; letter-spacing: 2px; }
     </style>
 </head>
 <body ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)">
 
     <div id="splash">
-        <h1 style="font-family:Orbitron; color:var(--primary); font-size:24px; text-shadow: 0 0 20px var(--primary);">DAX PRO</h1>
-        <p style="color:#444; font-size:10px; font-family:Orbitron; margin-bottom:40px;">v15.0 ULTRA MONITOR</p>
-        <button class="btn-main" onclick="requestBluetooth()">INITIATE SYSTEM</button>
-        <button class="btn-main" style="border-color:#222; color:#444;" onclick="startMode()">SIMULATE LINK</button>
+        <h1 style="font-family:Orbitron; color:var(--primary); font-size:26px; margin-bottom:0;">DAX PRO</h1>
+        <p style="color:#333; font-family:Orbitron; font-size:9px; letter-spacing:4px; margin-bottom:40px;">DIAGNOSTICS v16</p>
+        <button class="btn-main" onclick="requestBluetooth()">START LIVE LINK</button>
+        <button class="btn-main" style="border-color:#111; color:#333;" onclick="startMode()">RUN SIMULATION</button>
     </div>
 
     <header>
-        <div class="header-title">SYSTEM REALTIME DATA</div>
+        <div class="header-title">REALTIME MONITOR</div>
     </header>
 
     <div id="view-slider">
         <div id="page-podaci" class="page">
-            <div class="card-container">
-                <div id="card-aku" class="card">
-                    <div class="card-label"><span>🔋</span> BATTERY VOLTAGE</div>
-                    <div id="aku-val" class="main-val">--.- V</div>
-                    <div class="bar-bg"><div id="aku-bar" class="bar-fill"></div></div>
-                </div>
-                <div class="grid" id="main-grid"></div>
-            </div>
-            <div class="hint-swipe">SWIPE LEFT FOR SCANNER</div>
+            <div id="aku-box"></div> <div id="main-list"></div> <div class="hint-text">POVRECI LEVO ZA SKENIRANJE</div>
         </div>
 
-        <div id="page-greske" class="page" onclick="runScan()">
-            <div class="scanner-hex" id="hex-icon">
-                <span id="hex-text" style="font-family:Orbitron; font-size:12px; color:var(--primary);">READY</span>
+        <div id="page-greske" class="page" onclick="executeScan()">
+            <div class="scan-container">
+                <div class="radar">
+                    <div class="radar-line" id="radar-anim"></div>
+                    <span id="radar-status" style="font-family:Orbitron; color:#111; font-size:12px;">SCAN</span>
+                </div>
+                <div id="error-output"></div>
+                <div class="hint-text" id="diag-hint">TAP EKRAN ZA SKENIRANJE</div>
             </div>
-            <div id="err-log"></div>
-            <div class="hint-swipe" id="diag-hint">TAP HEXAGON TO BEGIN SCAN</div>
         </div>
     </div>
 
@@ -120,67 +111,92 @@
         function handleTouchMove(e) {
             touchendX = e.changedTouches[0].screenX;
             const slider = document.getElementById('view-slider');
-            if (touchstartX - touchendX > 70) slider.style.transform = "translateX(-100vw)";
-            if (touchendX - touchstartX > 70) slider.style.transform = "translateX(0)";
+            // Spreči swipe ako skrolujemo listu
+            if (Math.abs(touchstartX - touchendX) > 80) {
+                if (touchstartX - touchendX > 0) slider.style.transform = "translateX(-100vw)";
+                else slider.style.transform = "translateX(0)";
+            }
         }
 
         const sensorDb = [
-            { id: 'dpf', label: 'DPF Soot', unit: '%', min: 0, max: 70, icon: '💨' },
-            { id: 'ant', label: 'Coolant', unit: '°C', min: 80, max: 100, icon: '🌡️' },
-            { id: 'rpm', label: 'Engine', unit: 'RPM', min: 0, max: 3500, icon: '⚙️' },
-            { id: 'brz', label: 'Speed', unit: 'kmh', min: 0, max: 140, icon: '🚀' },
+            { id: 'aku', label: 'Battery Voltage', unit: 'V', min: 13.0, max: 14.8, icon: '🔋' },
+            { id: 'dpf', label: 'DPF Soot Level', unit: '%', min: 0, max: 70, icon: '💨' },
+            { id: 'ant', label: 'Coolant Temp', unit: '°C', min: 80, max: 100, icon: '🌡️' },
+            { id: 'rpm', label: 'Engine Speed', unit: 'RPM', min: 0, max: 3500, icon: '⚙️' },
+            { id: 'brz', label: 'Vehicle Speed', unit: 'kmh', min: 0, max: 140, icon: '🚀' },
             { id: 'load', label: 'Engine Load', unit: '%', min: 0, max: 80, icon: '📊' },
-            { id: 'iat', label: 'Intake Air', unit: '°C', min: 10, max: 50, icon: '❄️' }
+            { id: 'iat', label: 'Intake Temp', unit: '°C', min: 10, max: 50, icon: '❄️' },
+            { id: 'egr', label: 'EGR Temperature', unit: '°C', min: 100, max: 450, icon: '♻️' }
         ];
 
         function init() {
-            const grid = document.getElementById('main-grid');
-            grid.innerHTML = sensorDb.map(s => `
+            const list = document.getElementById('main-list');
+            list.innerHTML = sensorDb.map(s => `
                 <div id="card-${s.id}" class="card">
-                    <div class="card-label"><span>${s.icon}</span> ${s.label}</div>
-                    <div id="${s.id}-val" class="card-val">--</div>
-                    <div class="bar-bg"><div id="${s.id}-bar" class="bar-fill"></div></div>
+                    <div class="card-icon">${s.icon}</div>
+                    <div class="card-info">
+                        <div class="card-label">${s.label}</div>
+                        <div id="${s.id}-val" class="card-val">--</div>
+                    </div>
+                    <div class="card-visual">
+                        <div class="vis-bar" style="height:20%"></div>
+                        <div class="vis-bar" style="height:50%"></div>
+                        <div class="vis-bar" style="height:80%"></div>
+                        <div class="vis-bar" style="height:40%"></div>
+                    </div>
                 </div>
             `).join('');
         }
 
-        function runScan() {
+        function executeScan() {
             if(scanActive) return;
             scanActive = true;
-            const log = document.getElementById('err-log');
-            const hex = document.getElementById('hex-text');
+            const output = document.getElementById('error-output');
+            const radar = document.getElementById('radar-anim');
+            const status = document.getElementById('radar-status');
             const hint = document.getElementById('diag-hint');
-            
-            log.innerHTML = "";
-            hex.innerText = "SCAN";
-            hint.innerText = "COMMUNICATING WITH ECU...";
 
-            const steps = [
-                "Establishing OBDII Link...",
-                "Reading Engine DTCs...",
-                "P0420: Catalyst Efficiency Low",
-                "Reading Transmission DTCs...",
-                "B1202: Power Circuit Fault",
-                "Scan Complete. 2 Faults Found."
-            ];
+            output.innerHTML = "";
+            radar.style.display = "block";
+            status.innerText = "...";
+            status.style.color = "var(--primary)";
+            hint.innerText = "KOMUNIKACIJA SA ECU...";
 
-            steps.forEach((text, i) => {
+            setTimeout(() => {
+                radar.style.display = "none";
+                status.innerText = "ERR";
+                status.style.color = "red";
+                output.innerHTML = `
+                    <div class="err-item">
+                        <b style="font-family:Orbitron; color:red; font-size:18px;">P0420</b><br>
+                        <span style="font-size:12px; color:#aaa;">Catalyst System Efficiency Below Threshold</span>
+                    </div>
+                    <div class="err-item">
+                        <b style="font-family:Orbitron; color:red; font-size:18px;">P0101</b><br>
+                        <span style="font-size:12px; color:#aaa;">MAF Sensor Circuit Range/Performance</span>
+                    </div>
+                `;
+                hint.innerText = "TAP ZA BRISANJE GREŠAKA";
+                scanActive = "ERROR";
+            }, 2500);
+
+            // Ako je već bio error, briši
+            if(scanActive === "ERROR") {
+                radar.style.display = "block";
+                hint.innerText = "BRISANJE MEMORIJE...";
                 setTimeout(() => {
-                    log.innerHTML += `<div class="log-entry">${text}</div>`;
-                    log.scrollTop = log.scrollHeight;
-                    if(i === steps.length - 1) {
-                        hex.innerText = "CLEAR";
-                        hex.style.color = "red";
-                        hint.innerText = "TAP TO RESET ERRORS";
-                        scanActive = false;
-                    }
-                }, i * 600);
-            });
+                    radar.style.display = "none";
+                    status.innerText = "OK";
+                    status.style.color = "var(--safe)";
+                    output.innerHTML = '<p style="color:var(--safe); font-family:Orbitron; margin-top:20px;">SISTEM ISPRAVAN</p>';
+                    hint.innerText = "TAP ZA NOVI SKEN";
+                    scanActive = false;
+                }, 2000);
+            }
         }
 
         function startMode() {
-            document.getElementById('splash').style.opacity = "0";
-            setTimeout(() => document.getElementById('splash').style.display = "none", 500);
+            document.getElementById('splash').style.transform = "translateY(-100%)";
             setInterval(updateAll, 1000);
         }
 
@@ -192,27 +208,26 @@
         }
 
         function updateAll() {
-            let aku = (Math.random() * 0.5 + 13.9).toFixed(1);
-            applyEffect('aku', aku, 13.0, 14.8);
             sensorDb.forEach(s => {
-                let val = Math.floor(Math.random() * (s.max * 1.1));
-                applyEffect(s.id, val, s.min, s.max);
+                let val = (s.id === 'aku') ? (Math.random() * 0.8 + 13.5).toFixed(1) : Math.floor(Math.random() * (s.max * 1.1));
+                const vEl = document.getElementById(s.id + '-val');
+                const cEl = document.getElementById('card-' + s.id);
+                const bars = cEl.querySelectorAll('.vis-bar');
+
+                let isSafe = val >= s.min && val <= s.max;
+                if(s.id === 'brz' || s.id === 'rpm') isSafe = true;
+
+                vEl.innerText = val + s.unit;
+                vEl.className = 'card-val ' + (isSafe ? 'safe-text' : 'danger-text');
+                cEl.style.borderColor = isSafe ? "#151515" : "rgba(255,17,17,0.3)";
+
+                bars.forEach(b => {
+                    b.style.height = Math.random() * 100 + "%";
+                    b.style.background = isSafe ? "var(--safe)" : "var(--danger)";
+                });
             });
         }
 
-        function applyEffect(id, val, min, max) {
-            const vEl = document.getElementById(id + '-val');
-            const cEl = document.getElementById('card-' + id);
-            const bEl = document.getElementById(id + '-bar');
-            let isSafe = val >= min && val <= max;
-            if(id === 'brz' || id === 'rpm') isSafe = true;
-            
-            vEl.innerText = val + (id==='aku'?' V':(sensorDb.find(s=>s.id===id).unit));
-            vEl.className = (id==='aku'?'main-val':'card-val') + (isSafe ? ' safe-text' : ' danger-text');
-            cEl.style.borderColor = isSafe ? "#222" : "var(--danger)";
-            bEl.style.backgroundColor = isSafe ? "var(--safe)" : "var(--danger)";
-            bEl.style.width = Math.min((val / (max * 1.1)) * 100, 100) + "%";
-        }
         init();
     </script>
 </body>
