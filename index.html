@@ -21,54 +21,56 @@
         body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: #fff; font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; user-select: none; }
 
         header { 
-            position: fixed; top: 0; width: 100%; height: 60px; background: #000; 
+            position: fixed; top: 0; width: 100%; height: 50px; background: #000; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             z-index: 100; border-bottom: 1px solid #1a1a1a;
             padding-top: env(safe-area-inset-top);
         }
-        .header-title { font-family: 'Orbitron'; font-size: 11px; color: var(--primary); letter-spacing: 1px; text-shadow: 0 0 5px var(--primary); }
-        #car-info { font-size: 9px; font-weight: bold; color: #888; text-transform: uppercase; margin-top: 1px; }
+        .header-title { font-family: 'Orbitron'; font-size: 10px; color: var(--primary); letter-spacing: 1px; }
+        #car-info { font-size: 8px; font-weight: bold; color: #666; text-transform: uppercase; }
 
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.6s ease-in-out; }
-        .btn-main { padding: 15px 30px; border-radius: 6px; background: none; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-weight: 800; cursor: pointer; width: 80%; margin: 8px; font-size: 12px; }
+        .btn-main { padding: 12px 25px; border-radius: 6px; background: none; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-weight: 800; cursor: pointer; width: 80%; margin: 5px; font-size: 11px; }
 
-        .page { display: none; position: absolute; top: 60px; bottom: 65px; width: 100%; padding: 8px; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        /* Smanjen padding stranice */
+        .page { display: none; position: absolute; top: 50px; bottom: 65px; width: 100%; padding: 5px; flex-direction: column; overflow: hidden; }
         .page.active { display: flex; }
 
-        /* FIKSIRANA VISINA KARTICA DA NE BI SKAKALE */
+        /* ZNATNO SMANJENA VISINA KARTICA */
         .card { 
-            background: var(--card-bg); border-radius: 12px; border: 1px solid #1a1a1a; 
-            padding: 12px 12px 0 12px; margin-bottom: 8px; cursor: pointer;
-            transition: border-color 0.4s ease, box-shadow 0.4s ease; 
+            background: var(--card-bg); border-radius: 10px; border: 1px solid #1a1a1a; 
+            padding: 8px 10px 0 10px; margin-bottom: 5px; cursor: pointer;
+            transition: all 0.3s ease; 
             overflow: hidden; position: relative;
-            min-height: 110px; /* Osigurava da su sve kartice uvek iste visine */
-            flex-shrink: 0; /* Sprečava sabijanje kartica */
+            min-height: 85px; /* Smanjeno sa 110px */
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
         }
 
-        .status-safe { border-color: var(--safe) !important; box-shadow: 0 0 10px rgba(0, 255, 136, 0.05) !important; }
-        .status-danger { border-color: var(--danger) !important; box-shadow: 0 0 15px rgba(255, 17, 17, 0.2) !important; }
+        .status-safe { border-color: var(--safe) !important; box-shadow: 0 0 5px rgba(0, 255, 136, 0.05) !important; }
+        .status-danger { border-color: var(--danger) !important; box-shadow: 0 0 10px rgba(255, 17, 17, 0.15) !important; }
 
+        /* Prilagođene veličine brojeva */
         .main-val, .card-val { 
-            font-family: 'Orbitron'; font-size: 32px; text-align: center; font-weight: 900; 
-            line-height: 1.2; margin: auto 0; /* Centriranje vrednosti u sredinu kartice */
+            font-family: 'Orbitron'; font-size: 26px; text-align: center; font-weight: 900; 
+            line-height: 1; margin-bottom: 5px;
         }
-        #aku-val { font-size: 46px; } 
+        #aku-val { font-size: 36px; } 
         
-        .safe-text { color: var(--safe); text-shadow: 0 0 10px var(--safe); }
-        .danger-text { color: var(--danger); text-shadow: 0 0 15px var(--danger); }
+        .safe-text { color: var(--safe); text-shadow: 0 0 8px var(--safe); }
+        .danger-text { color: var(--danger); text-shadow: 0 0 10px var(--danger); }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex-shrink: 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; flex-shrink: 0; }
         
-        .card-label { font-size: 11px; color: #ddd; text-transform: uppercase; font-weight: 900; letter-spacing: 0.5px; }
+        .card-label { font-size: 9px; color: #aaa; text-transform: uppercase; font-weight: 900; }
 
-        /* BAROVI FIKSIRANI NA DNU */
-        .bar-bg { width: calc(100% + 24px); height: 6px; background: #111; margin-left: -12px; margin-top: auto; position: relative; }
+        .bar-bg { width: calc(100% + 20px); height: 4px; background: #111; margin-left: -10px; position: relative; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease; }
 
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; border-top: 1px solid #1a1a1a; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 12px; font-weight: 800; color: #333; }
+        .nav-item { flex: 1; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 11px; font-weight: 800; color: #333; }
         .nav-item.active { color: var(--primary); text-shadow: 0 0 8px var(--primary); }
 
         #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.97); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
@@ -78,7 +80,7 @@
 <body>
 
     <div id="splash">
-        <h1 style="font-family:Orbitron; color:var(--primary); font-size:18px;">DAX DIAGNOSTIKA</h1>
+        <h1 style="font-family:Orbitron; color:var(--primary); font-size:16px;">DAX DIAGNOSTIKA</h1>
         <button class="btn-main" onclick="requestBluetooth()">POVEŽI ADAPTER</button>
         <button class="btn-main" style="border-color:#333; color:#555;" onclick="startMode('DEMO', 'AUDI A4 B8', 'WA1ZZZ8K8XXXXXXX')">SIMULACIJA</button>
     </div>
@@ -114,8 +116,8 @@
 
     <div id="modal" onclick="this.style.display='none'">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h2 id="m-title" style="color:var(--primary); font-family:Orbitron; margin:0 0 10px 0; font-size:16px; border-bottom: 1px solid #222; padding-bottom:5px;"></h2>
-            <div id="m-body" style="color:#ccc; font-size:14px; line-height:1.4;"></div>
+            <h2 id="m-title" style="color:var(--primary); font-family:Orbitron; margin:0 0 10px 0; font-size:14px; border-bottom: 1px solid #222; padding-bottom:5px;"></h2>
+            <div id="m-body" style="color:#ccc; font-size:12px;"></div>
             <button class="btn-main" style="width:100%; margin-top:15px; background:var(--primary); color:#000; border:none;" onclick="document.getElementById('modal').style.display='none'">ZATVORI</button>
         </div>
     </div>
@@ -126,14 +128,14 @@
         }
 
         const sensorDb = [
-            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: 'Idealno: Ispod 40%.' },
-            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: 'Radna temperatura je oko 90°C.' },
-            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800, info: 'Broj obrtaja motora u minuti.' },
-            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135, info: 'Trenutna brzina vozila.' },
-            { id: 'load', label: '📊 Opterećenje', unit: '%', min: 0, max: 80, info: 'Procentualno opterećenje motora.' },
-            { id: 'iat', label: '❄️ Usis Vazduha', unit: '°C', min: 5, max: 55, info: 'Temperatura vazduha na usisu.' },
-            { id: 'egr', label: '♻️ EGR Temp', unit: '°C', min: 120, max: 450, info: 'Temperatura izduvnih gasova u EGR.' },
-            { id: 'pri', label: '⏲️ Difer. Pri.', unit: ' hPa', min: 0, max: 40, info: 'Diferencijalni pritisak DPF filtera.' }
+            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: 'Ispod 40% idealno.' },
+            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: 'Radna 90°C.' },
+            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800, info: 'RPM motora.' },
+            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135, info: 'Brzina vozila.' },
+            { id: 'load', label: '📊 Opterećenje', unit: '%', min: 0, max: 80, info: 'Opterećenje %.' },
+            { id: 'iat', label: '❄️ Usis Vazduha', unit: '°C', min: 5, max: 55, info: 'Temp usisa.' },
+            { id: 'egr', label: '♻️ EGR Temp', unit: '°C', min: 120, max: 450, info: 'Temp EGR.' },
+            { id: 'pri', label: '⏲️ Difer. Pri.', unit: ' hPa', min: 0, max: 40, info: 'Pritisak DPF.' }
         ];
 
         function init() {
@@ -154,11 +156,11 @@
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
                 startMode('UŽIVO', 'AUDI A4 B8', 'WA1ZZZ8K8BXXXXXXX');
-            } catch (e) { alert("Povezivanje prekinuto."); }
+            } catch (e) { alert("Greška!"); }
         }
 
         function startMode(status, model, vin) {
-            document.getElementById('car-info').innerText = `${model} | VIN: ${vin}`;
+            document.getElementById('car-info').innerText = `${model}`;
             document.getElementById('splash').style.transform = "translateY(-100%)";
             setInterval(updateAll, 1000);
         }
@@ -189,7 +191,7 @@
         }
 
         function showInfo(label) {
-            let data = (label === 'NAPON AKUMULATORA') ? { label: 'Akumulator', info: 'Normalan napon u radu je između 13.8V i 14.4V.' } : sensorDb.find(s => s.label === label);
+            let data = (label === 'NAPON AKUMULATORA') ? { label: 'Akumulator', info: 'Idealno 13.8V-14.4V.' } : sensorDb.find(s => s.label === label);
             document.getElementById('m-title').innerText = data.label;
             document.getElementById('m-body').innerText = data.info;
             document.getElementById('modal').style.display = 'flex';
@@ -202,8 +204,8 @@
             document.getElementById('nav-'+t).classList.add('active');
         }
 
-        function doScan() { alert("Skeniranje u toku..."); }
-        function doClear() { alert("Greške obrisane."); }
+        function doScan() { alert("Skeniranje..."); }
+        function doClear() { alert("Brisanje..."); }
         
         init();
     </script>
