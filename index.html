@@ -3,109 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>DAX PRO v19</title>
+    <title>DAX PRO v20</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto:wght@900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --bg-color: #000; --primary: #00d2ff;
-            --safe: #00ff88; --danger: #ff1111;
-            --card-bg: #080808;
+            --bg-color: #000; --primary: #00d2ff; --safe: #00ff88; --danger: #ff1111;
         }
         body, html { margin: 0; padding: 0; background-color: var(--bg-color); color: #fff; font-family: 'Roboto', sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
 
         header { 
-            position: fixed; top: 0; width: 100%; height: 50px; background: rgba(0,0,0,0.9); 
+            position: fixed; top: 0; width: 100%; height: 60px; background: #000; 
             display: flex; align-items: center; justify-content: center; z-index: 100;
-            border-bottom: 1px solid #1a1a1a;
+            border-bottom: 1px solid #1a1a1a; padding-top: env(safe-area-inset-top);
         }
-        .header-title { font-family: 'Orbitron'; font-size: 13px; color: var(--primary); letter-spacing: 3px; font-weight: 900; }
+        .header-title { font-family: 'Orbitron'; font-size: 15px; color: #fff; letter-spacing: 4px; font-weight: 900; }
 
-        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: 0.6s ease; }
-        .btn-start { padding: 18px 45px; border-radius: 10px; background: none; border: 2px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-size: 14px; cursor: pointer; }
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: 0.6s ease-in-out; }
+        .btn-start { padding: 20px 50px; border-radius: 5px; background: none; border: 2px solid #fff; color: #fff; font-family: 'Orbitron'; font-size: 14px; cursor: pointer; }
 
-        #view-slider { display: flex; width: 200vw; height: 100vh; transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
-        .page { width: 100vw; height: 100vh; padding: 60px 15px 80px 15px; flex-shrink: 0; overflow-y: auto; }
+        #view-slider { display: flex; width: 200vw; height: 100vh; transition: transform 0.5s cubic-bezier(0.2, 1, 0.2, 1); }
+        .page { width: 100vw; height: 100vh; padding: 70px 15px 30px 15px; flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
-        /* LIVE DATA CARDS */
+        /* LISTA KARTICA */
         .card { 
-            background: var(--card-bg); border-radius: 18px; border: 1px solid #111; 
-            padding: 16px; margin-bottom: 10px; display: flex; align-items: center;
-            transition: all 0.5s ease;
+            background: #080808; border-radius: 12px; border: 1px solid #1a1a1a; 
+            padding: 20px; margin-bottom: 12px; display: flex; align-items: center;
+            transition: all 0.4s ease; position: relative;
         }
-        .card-icon { font-size: 26px; width: 45px; }
-        .card-info { flex-grow: 1; }
-        .card-label { font-size: 10px; color: #444; text-transform: uppercase; font-weight: 900; margin-bottom: 2px; }
-        .val-group { display: flex; align-items: baseline; gap: 4px; }
-        .card-val { font-family: 'Orbitron'; font-size: 38px; font-weight: 900; }
-        .card-unit { font-family: 'Orbitron'; font-size: 11px; color: #333; font-weight: 700; }
-
-        .card.safe { border-color: rgba(0,255,136,0.1); background: linear-gradient(145deg, #080808, #040804); }
-        .card.safe .card-val { color: var(--safe); text-shadow: 0 0 10px rgba(0,255,136,0.2); }
-        .card.danger { border-color: rgba(255,17,17,0.2); background: linear-gradient(145deg, #0c0404, #080808); }
-        .card.danger .card-val { color: var(--danger); text-shadow: 0 0 15px rgba(255,17,17,0.3); }
-
-        /* DIAGNOSTIC MOD - CLEAR EFFECT */
-        #page-greske { background: #020202; display: flex; flex-direction: column; }
-        .diag-ui { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+        .card:active { transform: scale(0.98); background: #111; }
         
-        .clear-hex {
-            width: 130px; height: 130px; margin: 20px 0; border: 2px solid var(--primary); 
-            display: flex; align-items: center; justify-content: center; font-family: 'Orbitron';
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            background: rgba(0, 210, 255, 0.05); cursor: pointer; transition: 0.3s;
-            animation: pulse-primary 2s infinite;
-        }
-        @keyframes pulse-primary { 0% { opacity: 0.6; } 50% { opacity: 1; box-shadow: 0 0 20px var(--primary); } 100% { opacity: 0.6; } }
+        .card-info { flex-grow: 1; }
+        .card-label { font-size: 11px; color: #666; text-transform: uppercase; font-weight: 900; margin-bottom: 5px; }
+        
+        .val-wrap { display: flex; align-items: baseline; gap: 8px; }
+        .card-val { font-family: 'Orbitron'; font-size: 42px; font-weight: 900; color: #fff; line-height: 1; }
+        .card-unit { font-family: 'Orbitron'; font-size: 14px; color: #444; }
 
-        #err-list { width: 100%; max-height: 250px; overflow-y: auto; padding: 10px; }
-        .err-card { 
-            background: #0a0000; border: 1px solid #311; padding: 12px; margin-bottom: 8px; border-radius: 10px;
-            border-left: 4px solid var(--danger); transition: 0.5s;
-        }
-        .err-card.deleting { opacity: 0; transform: scale(0.8) translateY(-20px); filter: blur(5px); }
+        /* SIGNALNE BOJE (SAMO BROJ I BORDER) */
+        .card.safe { border-left: 5px solid var(--safe); }
+        .card.danger { border-left: 5px solid var(--danger); }
+        .card.danger .card-val { color: var(--danger); text-shadow: 0 0 15px rgba(255,17,17,0.4); }
 
-        .btn-diag-main { 
-            width: 100%; padding: 20px; border-radius: 15px; border: 1px solid var(--primary); 
-            background: none; color: var(--primary); font-family: 'Orbitron'; font-weight: 900; font-size: 14px;
-            cursor: pointer; margin-top: auto;
-        }
+        /* DIJAGNOSTIKA - NOVI STIL */
+        #page-greske { background: #000; display: flex; flex-direction: column; }
+        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--primary); box-shadow: 0 0 15px var(--primary); display: none; z-index: 10; }
+        
+        #diag-output { flex-grow: 1; padding: 20px 0; }
+        .err-msg { background: #0a0000; border: 1px solid #311; padding: 15px; border-radius: 8px; margin-bottom: 10px; animation: slideIn 0.3s ease forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
 
-        .dot-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: #222; }
-        .dot.active { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        .btn-diag { width: 100%; padding: 22px; border-radius: 10px; border: 1px solid #fff; background: none; color: #fff; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; }
+
+        /* MODAL ZA DETALJE */
+        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 30px; }
+        .modal-content { border: 1px solid #333; padding: 30px; border-radius: 20px; width: 100%; text-align: center; }
+        .normale { color: var(--safe); font-family: 'Orbitron'; font-size: 18px; margin-top: 15px; }
+
+        .nav-hint { position: fixed; bottom: 20px; width: 100%; text-align: center; font-family: 'Orbitron'; font-size: 9px; color: #222; letter-spacing: 3px; }
     </style>
 </head>
 <body ontouchstart="handleTS(event)" ontouchmove="handleTM(event)">
 
     <div id="splash">
-        <h1 style="font-family:Orbitron; color:var(--primary); font-size:26px; text-shadow:0 0 15px var(--primary);">DAX PRO</h1>
-        <button class="btn-start" onclick="startApp()">START MONITOR</button>
+        <h1 style="font-family:Orbitron; font-size:28px; letter-spacing:5px;">DAX PRO</h1>
+        <button class="btn-start" onclick="startApp()">POVEŽI SISTEM</button>
     </div>
 
-    <header>
-        <div class="header-title" id="h-title">LIVE DATA</div>
-    </header>
+    <header><div class="header-title" id="h-title">LIVE DATA</div></header>
 
     <div id="view-slider">
         <div id="page-podaci" class="page">
             <div id="main-list"></div>
+            <div style="height: 50px;"></div>
         </div>
 
         <div id="page-greske" class="page">
-            <div class="diag-ui">
-                <div class="clear-hex" id="status-icon" onclick="startDiagnostic()">SCAN</div>
-                <div id="err-list">
-                    <p style="text-align:center; color:#222; font-family:Orbitron; margin-top:60px;">STANDBY</p>
-                </div>
+            <div class="scan-line" id="scanner"></div>
+            <div id="diag-output">
+                <p style="text-align:center; color:#222; font-family:Orbitron; margin-top:100px;">SYSTEM READY</p>
             </div>
-            <button id="clear-btn" class="btn-diag-main" onclick="clearDTC()" style="display:none;">CLEAR MEMORY</button>
+            <button id="main-diag-btn" class="btn-diag" onclick="runDiagnostic()">POKRENI SKENIRANJE</button>
         </div>
     </div>
 
-    <div class="dot-nav">
-        <div id="d1" class="dot active"></div>
-        <div id="d2" class="dot"></div>
+    <div class="nav-hint" id="nav-hint">PREVUCI LEVO ZA GREŠKE</div>
+
+    <div id="modal" onclick="this.style.display='none'">
+        <div class="modal-content">
+            <h2 id="m-title" style="font-family:Orbitron; color:#fff;"></h2>
+            <p id="m-desc" style="color:#888; margin-top:10px;"></p>
+            <div id="m-normale" class="normale"></div>
+            <button class="btn-start" style="margin-top:30px; width:100%; font-size:12px;">ZATVORI</button>
+        </div>
     </div>
 
     <script>
@@ -116,35 +106,33 @@
         function handleTM(e) {
             let moveX = e.touches[0].clientX;
             let diff = tsX - moveX;
-            if (Math.abs(diff) > 70) {
-                if (diff > 0) moveSlider(1);
-                else moveSlider(0);
+            if (Math.abs(diff) > 80) {
+                activeIdx = diff > 0 ? 1 : 0;
+                document.getElementById('view-slider').style.transform = `translateX(-${activeIdx * 100}vw)`;
+                document.getElementById('h-title').innerText = activeIdx === 0 ? "LIVE DATA" : "DIAGNOSTICS";
+                document.getElementById('nav-hint').innerText = activeIdx === 0 ? "PREVUCI LEVO ZA GREŠKE" : "PREVUCI DESNO ZA MERENJA";
             }
         }
 
-        function moveSlider(idx) {
-            activeIdx = idx;
-            document.getElementById('view-slider').style.transform = `translateX(-${idx * 100}vw)`;
-            document.getElementById('d1').className = idx === 0 ? 'dot active' : 'dot';
-            document.getElementById('d2').className = idx === 1 ? 'dot active' : 'dot';
-            document.getElementById('h-title').innerText = idx === 0 ? "LIVE DATA" : "DIAGNOSTIC";
-        }
-
         const sensorDb = [
-            { id: 'aku', label: 'Battery', unit: 'V', min: 13.1, max: 14.8, icon: '🔋' },
-            { id: 'ant', label: 'Coolant', unit: '°C', min: 80, max: 105, icon: '🌡️' },
-            { id: 'rpm', label: 'Engine', unit: 'RPM', min: 0, max: 4000, icon: '⚙️' },
-            { id: 'dpf', label: 'DPF Soot', unit: '%', min: 0, max: 70, icon: '💨' },
-            { id: 'brz', label: 'Speed', unit: 'KMH', min: 0, max: 150, icon: '🚀' }
+            { id: 'aku', label: 'Napon Akumulatora', unit: 'V', min: 13.0, max: 14.8, norm: '13.8 - 14.4 V', info: 'Napon punjenja alternatora.' },
+            { id: 'rpm', label: 'Obrtaji Motora', unit: 'RPM', min: 0, max: 4500, norm: '800 - 3500 RPM', info: 'Brzina rada radilice motora.' },
+            { id: 'ant', label: 'Temperatura Antifriza', unit: '°C', min: 80, max: 105, norm: '88 - 98 °C', info: 'Optimalna radna temperatura motora.' },
+            { id: 'dpf', label: 'DPF Zaprljanost', unit: '%', min: 0, max: 60, norm: 'Ispod 40%', info: 'Nivo čađi u filteru čestica.' },
+            { id: 'brz', label: 'Brzina Vozila', unit: 'KMH', min: 0, max: 200, norm: 'N/A', info: 'Trenutna brzina sa senzora točkova.' },
+            { id: 'load', label: 'Opterećenje Motora', unit: '%', min: 0, max: 85, norm: 'Ler: 15-25%', info: 'Procenat snage koji motor trenutno koristi.' },
+            { id: 'iat', label: 'Usisna Temperatura', unit: '°C', min: 10, max: 60, norm: 'Spoljna + 20°C', info: 'Temperatura vazduha koji ulazi u turbo.' },
+            { id: 'egr', label: 'EGR Protok', unit: '%', min: 0, max: 100, norm: 'Varijabilno', info: 'Rad ventila za recirkulaciju gasova.' },
+            { id: 'pri', label: 'DPF Diferencijal', unit: 'hPa', min: 0, max: 40, norm: '0 - 15 hPa', info: 'Pritisak ispred i iza DPF-a.' },
+            { id: 'oil', label: 'Temperatura Ulja', unit: '°C', min: 80, max: 120, norm: '90 - 110 °C', info: 'Temperatura motornog ulja u karteru.' }
         ];
 
         function init() {
             document.getElementById('main-list').innerHTML = sensorDb.map(s => `
-                <div id="card-${s.id}" class="card safe">
-                    <div class="card-icon">${s.icon}</div>
+                <div id="card-${s.id}" class="card safe" onclick="showDetails('${s.id}')">
                     <div class="card-info">
                         <div class="card-label">${s.label}</div>
-                        <div class="val-group">
+                        <div class="val-wrap">
                             <span id="${s.id}-val" class="card-val">--</span>
                             <span class="card-unit">${s.unit}</span>
                         </div>
@@ -153,42 +141,40 @@
             `).join('');
         }
 
-        function startDiagnostic() {
-            const list = document.getElementById('err-list');
-            const icon = document.getElementById('status-icon');
-            icon.innerText = "...";
-            list.innerHTML = "<p style='text-align:center; color:var(--primary); font-family:Orbitron;'>ACCESSING ECU...</p>";
-            
-            setTimeout(() => {
-                icon.innerText = "ERR";
-                icon.style.borderColor = "var(--danger)";
-                icon.style.color = "var(--danger)";
-                list.innerHTML = `
-                    <div class="err-card"><b style="color:red; font-family:Orbitron;">P0420</b><br><small style="color:#444;">CATALYST EFFICIENCY</small></div>
-                    <div class="err-card"><b style="color:red; font-family:Orbitron;">P0101</b><br><small style="color:#444;">MAF CIRCUIT RANGE</small></div>
-                `;
-                document.getElementById('clear-btn').style.display = "block";
-            }, 1500);
+        function showDetails(id) {
+            const s = sensorDb.find(x => x.id === id);
+            document.getElementById('m-title').innerText = s.label;
+            document.getElementById('m-desc').innerText = s.info;
+            document.getElementById('m-normale').innerText = "NORMALA: " + s.norm;
+            document.getElementById('modal').style.display = 'flex';
         }
 
-        function clearDTC() {
-            const cards = document.querySelectorAll('.err-card');
-            const icon = document.getElementById('status-icon');
-            const btn = document.getElementById('clear-btn');
-            
-            btn.innerText = "PURGING...";
-            cards.forEach((c, i) => {
-                setTimeout(() => c.classList.add('deleting'), i * 300);
-            });
+        function runDiagnostic() {
+            const out = document.getElementById('diag-output');
+            const btn = document.getElementById('main-diag-btn');
+            const scanner = document.getElementById('scanner');
 
-            setTimeout(() => {
-                document.getElementById('err-list').innerHTML = "<p style='text-align:center; color:var(--safe); font-family:Orbitron; margin-top:60px;'>MEMORY CLEAN</p>";
-                icon.innerText = "OK";
-                icon.style.borderColor = "var(--safe)";
-                icon.style.color = "var(--safe)";
-                btn.style.display = "none";
-                btn.innerText = "CLEAR MEMORY";
-            }, 1200);
+            if (btn.innerText === "OBRIŠI GREŠKE") {
+                scanner.style.display = "block";
+                scanner.style.background = "red";
+                scanner.animate([{top: '60px'}, {top: '90vh'}], {duration: 1500, iterations: 1});
+                setTimeout(() => {
+                    out.innerHTML = '<p style="text-align:center; color:var(--safe); font-family:Orbitron; margin-top:100px;">SISTEM ČIST</p>';
+                    btn.innerText = "POKRENI SKENIRANJE";
+                    btn.style.borderColor = "#fff";
+                    scanner.style.display = "none";
+                }, 1500);
+            } else {
+                out.innerHTML = '<p style="text-align:center; color:var(--primary); font-family:Orbitron; margin-top:100px;">PRISTUP ECU...</p>';
+                setTimeout(() => {
+                    out.innerHTML = `
+                        <div class="err-msg"><b style="color:red; font-family:Orbitron;">P0420</b><br><small style="color:#444;">Efikasnost katalizatora ispod praga</small></div>
+                        <div class="err-msg"><b style="color:red; font-family:Orbitron;">P0101</b><br><small style="color:#444;">Protokomer: Signal van opsega</small></div>
+                    `;
+                    btn.innerText = "OBRIŠI GREŠKE";
+                    btn.style.borderColor = "red";
+                }, 2000);
+            }
         }
 
         function startApp() {
