@@ -32,33 +32,35 @@
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.6s ease-in-out; }
         .btn-main { padding: 15px 30px; border-radius: 6px; background: none; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-weight: 800; cursor: pointer; width: 80%; margin: 8px; font-size: 12px; }
 
-        /* Omogućeno skrolovanje pošto su kartice sada jedna ispod druge */
-        .page { display: none; position: absolute; top: 60px; bottom: 65px; width: 100%; padding: 10px; flex-direction: column; overflow-y: auto; }
+        .page { display: none; position: absolute; top: 60px; bottom: 65px; width: 100%; padding: 8px; flex-direction: column; overflow-y: auto; }
         .page.active { display: flex; }
 
-        /* SVE KARTICE IZGLEDAJU ISTO */
         .card { 
             background: var(--card-bg); border-radius: 12px; border: 1px solid #1a1a1a; 
-            padding: 15px; margin-bottom: 10px; cursor: pointer;
-            transition: all 0.4s ease;
-            width: 100%;
+            padding: 12px 12px 0 12px; margin-bottom: 8px; cursor: pointer;
+            transition: all 0.4s ease; overflow: hidden; position: relative;
         }
 
-        .status-safe { border-color: var(--safe) !important; box-shadow: 0 0 10px rgba(0, 255, 136, 0.1) !important; }
-        .status-danger { border-color: var(--danger) !important; box-shadow: 0 0 15px rgba(255, 17, 17, 0.25) !important; }
+        .status-safe { border-color: var(--safe) !important; box-shadow: 0 0 10px rgba(0, 255, 136, 0.05) !important; }
+        .status-danger { border-color: var(--danger) !important; box-shadow: 0 0 15px rgba(255, 17, 17, 0.2) !important; }
 
-        /* SVE VREDNOSTI SU SADA VELIKE KAO NA AKUMULATORU */
-        .main-val, .card-val { font-family: 'Orbitron'; font-size: 40px; text-align: center; font-weight: 900; line-height: 1.1; margin: 5px 0; }
+        /* VELIKI BROJEVI ZA SVE */
+        .main-val, .card-val { 
+            font-family: 'Orbitron'; font-size: 32px; text-align: center; font-weight: 900; 
+            line-height: 1.2; margin: 10px 0 15px 0; 
+        }
+        #aku-val { font-size: 46px; } /* Akumulator ostaje najveći */
         
-        .safe-text { color: var(--safe); text-shadow: 0 0 12px var(--safe); }
+        .safe-text { color: var(--safe); text-shadow: 0 0 10px var(--safe); }
         .danger-text { color: var(--danger); text-shadow: 0 0 15px var(--danger); }
 
-        /* GRID JE SADA SAMO JEDNA KOLONA */
-        .grid { display: flex; flex-direction: column; width: 100%; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
-        .card-label { font-size: 13px; color: #bbb; text-transform: uppercase; font-weight: 900; margin-bottom: 5px; }
+        /* POVEĆANI NASLOVI KARTICA */
+        .card-label { font-size: 11px; color: #ddd; text-transform: uppercase; font-weight: 900; letter-spacing: 0.5px; }
 
-        .bar-bg { width: 100%; height: 5px; background: #111; margin-top: 10px; border-radius: 3px; }
+        /* BAROVI NA SAMOM DNU KARTICE */
+        .bar-bg { width: calc(100% + 24px); height: 6px; background: #111; margin-left: -12px; margin-top: auto; position: relative; bottom: 0; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease; }
 
         nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: #000; display: flex; border-top: 1px solid #1a1a1a; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
@@ -67,7 +69,6 @@
 
         #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.97); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: #050505; width: 100%; max-width: 450px; border: 1px solid var(--primary); padding: 20px; border-radius: 12px; }
-        .m-text { color: #ddd; font-size: 14px; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -117,20 +118,18 @@
 
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => {
-                console.log("Aplikacija spremna.");
-            });
+            navigator.serviceWorker.register('sw.js');
         }
 
         const sensorDb = [
-            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: '<b>Idealno:</b> Ispod 40%.' },
-            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: '<b>Idealno:</b> 90°C.' },
-            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800, info: '<b>Ler:</b> cca 800 RPM.' },
-            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135, info: 'Brzina sa senzora vozila.' },
+            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: 'Ispod 40% je idealno.' },
+            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: 'Radna temp je 90°C.' },
+            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800, info: 'Broj obrtaja motora.' },
+            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135, info: 'Brzina kretanja.' },
             { id: 'load', label: '📊 Opterećenje', unit: '%', min: 0, max: 80, info: 'Opterećenje motora.' },
             { id: 'iat', label: '❄️ Usis Vazduha', unit: '°C', min: 5, max: 55, info: 'Temperatura usisa.' },
-            { id: 'egr', label: '♻️ EGR Temp', unit: '°C', min: 120, max: 450, info: 'Temperatura EGR sistema.' },
-            { id: 'pri', label: '⏲️ Difer. Pritisak', unit: ' hPa', min: 0, max: 40, info: 'Pritisak DPF filtera.' }
+            { id: 'egr', label: '♻️ EGR Temp', unit: '°C', min: 120, max: 450, info: 'Temperatura EGR.' },
+            { id: 'pri', label: '⏲️ Difer. Pri.', unit: ' hPa', min: 0, max: 40, info: 'Pritisak DPF filtera.' }
         ];
 
         function init() {
@@ -147,28 +146,24 @@
         async function requestBluetooth() {
             try {
                 const device = await navigator.bluetooth.requestDevice({
-                    filters: [
-                        { namePrefix: 'OBD' }, { namePrefix: 'V-LINK' }, 
-                        { namePrefix: 'ELM' }, { namePrefix: 'IOS-Vlink' }
-                    ],
+                    filters: [{ namePrefix: 'OBD' }, { namePrefix: 'ELM' }],
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
                 startMode('UŽIVO', 'AUDI A4 B8', 'WA1ZZZ8K8BXXXXXXX');
-            } catch (e) { alert("Povezivanje prekinuto."); }
+            } catch (e) { alert("Greška pri povezivanju."); }
         }
 
         function startMode(status, model, vin) {
             document.getElementById('car-info').innerText = `${model} | VIN: ${vin}`;
-            document.getElementById('car-info').style.color = status === 'UŽIVO' ? "#00ff88" : "#ffcc00";
             document.getElementById('splash').style.transform = "translateY(-100%)";
             setInterval(updateAll, 1000);
         }
 
         function updateAll() {
-            let aku = (Math.random() * 2.2 + 12.1).toFixed(1);
-            applyEffect('aku', aku, 13.0, 14.9);
+            let aku = (Math.random() * 1.5 + 12.5).toFixed(1);
+            applyEffect('aku', aku, 13.0, 14.8);
             sensorDb.forEach(s => {
-                let val = Math.floor(Math.random() * (s.max * 1.2));
+                let val = Math.floor(Math.random() * (s.max * 1.1));
                 applyEffect(s.id, val, s.min, s.max);
             });
         }
@@ -181,24 +176,16 @@
             vEl.innerText = val + unit;
             let isSafe = val >= min && val <= max;
             if(id === 'brz' || id === 'rpm') isSafe = true;
-            if(isSafe) {
-                vEl.className = (id === 'aku' ? 'main-val' : 'card-val') + ' safe-text';
-                cEl.className = 'card status-safe';
-                bEl.style.backgroundColor = 'var(--safe)';
-            } else {
-                vEl.className = (id === 'aku' ? 'main-val' : 'card-val') + ' danger-text';
-                cEl.className = 'card status-danger';
-                bEl.style.backgroundColor = 'var(--danger)';
-            }
+            
+            vEl.className = (id === 'aku' ? 'main-val' : 'card-val') + (isSafe ? ' safe-text' : ' danger-text');
+            cEl.className = 'card' + (isSafe ? ' status-safe' : ' status-danger');
+            bEl.style.backgroundColor = isSafe ? 'var(--safe)' : 'var(--danger)';
             bEl.style.width = Math.min((val / (max * 1.1)) * 100, 100) + "%";
         }
 
         function showInfo(label) {
-            let data = (label === 'NAPON AKUMULATORA') ? 
-                { label: 'Napon Akumulatora', info: '<b>Idealno:</b> 13.8V - 14.4V u radu.' } :
-                sensorDb.find(s => s.label === label);
+            let data = (label === 'NAPON AKUMULATORA') ? { label: 'Akumulator', info: 'Idealno: 13.8V - 14.4V' } : sensorDb.find(s => s.label === label);
             document.getElementById('m-title').innerText = data.label;
-            document.getElementById('m-body').innerHTML = `<div class="m-text">${data.info}</div>`;
             document.getElementById('modal').style.display = 'flex';
         }
 
@@ -209,22 +196,8 @@
             document.getElementById('nav-'+t).classList.add('active');
         }
 
-        function doScan() {
-            const list = document.getElementById('err-list');
-            list.innerHTML = '<p style="color:var(--primary); font-family:Orbitron; font-size:11px;">SKENIRANJE...</p>';
-            setTimeout(() => {
-                list.innerHTML = `<div style="background:#110505; border:1px solid red; padding:10px; border-radius:8px; text-align:left;">
-                    <div style="color:red; font-family:Orbitron; font-size:18px;">P0420</div>
-                    <div style="color:#888; font-size:12px; margin-top:3px;">Efikasnost katalizatora ispod praga.</div>
-                </div>`;
-            }, 1200);
-        }
-
-        function doClear() {
-            const list = document.getElementById('err-list');
-            list.innerHTML = '<p style="color:red; font-family:Orbitron; font-size:11px;">BRISANJE...</p>';
-            setTimeout(() => { list.innerHTML = '<p style="color:var(--safe); font-family:Orbitron; font-size:11px;">SISTEM ČIST</p>'; }, 1500);
-        }
+        function doScan() { alert("Skeniranje ECU..."); }
+        function doClear() { alert("Brisanje grešaka..."); }
         init();
     </script>
 </body>
