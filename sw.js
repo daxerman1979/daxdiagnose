@@ -1,5 +1,5 @@
 // Naziv keša (možeš menjati verziju kad god nešto bitno izmeniš)
-const CACHE_NAME = 'dax-diag-v11';
+const CACHE_NAME = 'DAX CAR SCAN';
 
 // Service Worker se instalira
 self.addEventListener('install', (event) => {
