@@ -27,42 +27,60 @@
             padding-top: env(safe-area-inset-top);
         }
         .header-title { font-family: 'Orbitron'; font-size: 11px; color: var(--primary); letter-spacing: 1px; }
-        #car-info { font-size: 9px; font-weight: bold; color: #555; text-transform: uppercase; }
+        #car-info { font-size: 9px; font-weight: bold; color: #444; text-transform: uppercase; }
 
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; transition: transform 0.6s ease-in-out; }
         .btn-main { padding: 15px 30px; border-radius: 6px; background: none; border: 1px solid var(--primary); color: var(--primary); font-family: 'Orbitron'; font-weight: 800; cursor: pointer; width: 80%; margin: 8px; font-size: 12px; }
 
-        /* Kontejner za Swipe efekat */
+        /* Slider Kontejner */
         #view-slider { display: flex; width: 200vw; height: 100vh; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        .page { width: 100vw; height: 100vh; padding: 70px 10px 20px 10px; flex-shrink: 0; overflow-y: auto; }
+        .page { width: 100vw; height: 100vh; padding: 70px 10px 10px 10px; flex-shrink: 0; display: flex; flex-direction: column; }
 
-        /* VELIKE KARTICE SU SE VRATILE */
+        /* KARTICE POPUNJAVAJU EKRAN */
         .card { 
             background: var(--card-bg); border-radius: 12px; border: 1px solid #1a1a1a; 
-            padding: 15px 15px 0 15px; margin-bottom: 10px; cursor: pointer;
-            min-height: 115px; display: flex; flex-direction: column; justify-content: space-between;
-            overflow: hidden; position: relative;
+            padding: 12px; margin-bottom: 8px; cursor: pointer;
+            display: flex; flex-direction: column; justify-content: space-between;
+            overflow: hidden; position: relative; flex-grow: 1;
         }
 
         .status-safe { border-color: var(--safe) !important; box-shadow: 0 0 10px rgba(0, 255, 136, 0.05) !important; }
         .status-danger { border-color: var(--danger) !important; box-shadow: 0 0 15px rgba(255, 17, 17, 0.2) !important; }
 
-        .main-val, .card-val { font-family: 'Orbitron'; font-size: 36px; text-align: center; font-weight: 900; line-height: 1; margin-bottom: 10px; }
-        #aku-val { font-size: 48px; } 
+        .main-val, .card-val { font-family: 'Orbitron'; font-size: clamp(24px, 6vw, 36px); text-align: center; font-weight: 900; line-height: 1; }
+        #aku-val { font-size: clamp(32px, 8vw, 48px); } 
         
         .safe-text { color: var(--safe); text-shadow: 0 0 10px var(--safe); }
         .danger-text { color: var(--danger); text-shadow: 0 0 15px var(--danger); }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .card-label { font-size: 11px; color: #888; text-transform: uppercase; font-weight: 900; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-grow: 2; margin-top: 8px; }
+        .card-label { font-size: 10px; color: #777; text-transform: uppercase; font-weight: 900; }
 
-        .bar-bg { width: calc(100% + 30px); height: 6px; background: #111; margin-left: -15px; position: relative; }
+        .bar-bg { width: calc(100% + 24px); height: 5px; background: #111; margin-left: -12px; position: relative; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.8s ease; }
 
-        /* Strana za greske */
-        #page-greske { background: #050000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .err-hint { font-size: 10px; color: #444; font-family: 'Orbitron'; margin-top: 20px; }
+        /* STRANA ZA GREŠKE I OKRUGLO DUGME */
+        #page-greske { background: #020000; align-items: center; justify-content: space-around; }
+        
+        .action-circle {
+            width: 140px; height: 140px; border-radius: 50%;
+            border: 2px solid var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron'; font-size: 14px; color: var(--primary);
+            cursor: pointer; position: relative;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(0, 210, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 210, 255, 0); }
+        }
+
+        .err-display { width: 100%; padding: 20px; min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .hint-text { font-family: 'Orbitron'; font-size: 11px; color: #444; letter-spacing: 1px; }
 
         #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.97); display: none; z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { background: #050505; width: 100%; max-width: 450px; border: 1px solid var(--primary); padding: 20px; border-radius: 12px; }
@@ -91,12 +109,16 @@
             <div class="grid" id="main-grid"></div>
         </div>
 
-        <div id="page-greske" class="page" onclick="doScan()">
-            <div id="err-list">
-                <p style="color:var(--primary); font-family:Orbitron; font-size:14px;">MOD ZA GREŠKE</p>
-                <p style="color:#333; font-size:12px;">TAPNI EKRAN ZA SKENIRANJE</p>
+        <div id="page-greske" class="page">
+            <div class="err-display" id="err-main-box">
+                <p id="err-status-text" style="color:#333; font-family:Orbitron;">ECU READY</p>
             </div>
-            <div class="err-hint">POVRECI DESNO ZA MERENJA</div>
+            
+            <div id="main-action-btn" class="action-circle" onclick="processAction()">
+                SKENIRAJ
+            </div>
+
+            <div class="hint-text" id="hint-action">KLIKNITE ZA SKENIRANJE</div>
         </div>
     </div>
 
@@ -109,29 +131,27 @@
     </div>
 
     <script>
-        // SWIPE LOGIKA
         let touchstartX = 0;
         let touchendX = 0;
-        
+        let currentMode = "SCAN"; // SCAN ili CLEAR
+
         function handleTouchStart(e) { touchstartX = e.changedTouches[0].screenX; }
         function handleTouchMove(e) {
             touchendX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }
-
-        function handleSwipe() {
             const slider = document.getElementById('view-slider');
-            if (touchstartX - touchendX > 100) slider.style.transform = "translateX(-100vw)"; // Levo
-            if (touchendX - touchstartX > 100) slider.style.transform = "translateX(0)";      // Desno
+            if (touchstartX - touchendX > 80) slider.style.transform = "translateX(-100vw)";
+            if (touchendX - touchstartX > 80) slider.style.transform = "translateX(0)";
         }
 
         const sensorDb = [
-            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75, info: 'Idealno ispod 40%.' },
-            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100, info: 'Radna 90°C.' },
-            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800, info: 'RPM motora.' },
-            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135, info: 'Brzina vozila.' },
-            { id: 'load', label: '📊 Opterećenje', unit: '%', min: 0, max: 80, info: 'Opterećenje %.' },
-            { id: 'iat', label: '❄️ Usis Vazduha', unit: '°C', min: 5, max: 55, info: 'Temp usisa.' }
+            { id: 'dpf', label: '💨 DPF Čađ', unit: '%', min: 0, max: 75 },
+            { id: 'ant', label: '🌡️ Antifriz', unit: '°C', min: 82, max: 100 },
+            { id: 'rpm', label: '⚙️ Obrtaji', unit: '', min: 0, max: 3800 },
+            { id: 'brz', label: '🚀 Brzina', unit: ' km/h', min: 0, max: 135 },
+            { id: 'load', label: '📊 Opterećenje', unit: '%', min: 0, max: 80 },
+            { id: 'iat', label: '❄️ Usis Vazduha', unit: '°C', min: 5, max: 55 },
+            { id: 'egr', label: '♻️ EGR Temp', unit: '°C', min: 120, max: 450 },
+            { id: 'pri', label: '⏲️ Difer. Pritisak', unit: ' hPa', min: 0, max: 40 }
         ];
 
         function init() {
@@ -145,6 +165,36 @@
             `).join('');
         }
 
+        function processAction() {
+            const btn = document.getElementById('main-action-btn');
+            const hint = document.getElementById('hint-action');
+            const box = document.getElementById('err-main-box');
+
+            if(currentMode === "SCAN") {
+                btn.innerText = "...";
+                box.innerHTML = '<p style="color:var(--primary); font-family:Orbitron;">SKENIRANJE U TOKU...</p>';
+                setTimeout(() => {
+                    box.innerHTML = '<div style="border:1px solid red; padding:15px; color:red; font-family:Orbitron; width:100%;">P0420<br><span style="font-size:10px; color:#555;">CATALYST SYSTEM EFFICIENCY</span></div>';
+                    btn.innerText = "OBRIŠI";
+                    btn.style.borderColor = "var(--danger)";
+                    btn.style.color = "var(--danger)";
+                    hint.innerText = "KLIKNITE ZA BRISANJE";
+                    currentMode = "CLEAR";
+                }, 1500);
+            } else {
+                btn.innerText = "...";
+                box.innerHTML = '<p style="color:var(--danger); font-family:Orbitron;">BRISANJE GREŠAKA...</p>';
+                setTimeout(() => {
+                    box.innerHTML = '<p style="color:var(--safe); font-family:Orbitron;">SISTEM ČIST</p>';
+                    btn.innerText = "SKENIRAJ";
+                    btn.style.borderColor = "var(--primary)";
+                    btn.style.color = "var(--primary)";
+                    hint.innerText = "KLIKNITE ZA SKENIRANJE";
+                    currentMode = "SCAN";
+                }, 1500);
+            }
+        }
+
         async function requestBluetooth() {
             try {
                 await navigator.bluetooth.requestDevice({
@@ -152,11 +202,11 @@
                     optionalServices: ['00001101-0000-1000-8000-00805f9b34fb']
                 });
                 startMode('UŽIVO', 'AUDI A4 B8', 'WA1ZZZ8K8BXXXXXXX');
-            } catch (e) { alert("Bluetooth prekinut."); }
+            } catch (e) { startMode('DEMO', 'DEMO MOD', 'WA1ZZZ8K8BXXXXXXX'); }
         }
 
         function startMode(status, model, vin) {
-            document.getElementById('car-info').innerText = `${model}`;
+            document.getElementById('car-info').innerText = model;
             document.getElementById('splash').style.transform = "translateY(-100%)";
             setInterval(updateAll, 1000);
         }
@@ -186,28 +236,9 @@
         }
 
         function showInfo(label) {
-            let data = (label === 'NAPON AKUMULATORA') ? { label: 'Akumulator', info: 'Normalno: 13.8V-14.4V.' } : sensorDb.find(s => s.label === label);
-            document.getElementById('m-title').innerText = data.label;
-            document.getElementById('m-body').innerText = data.info;
+            document.getElementById('m-title').innerText = label;
+            document.getElementById('m-body').innerText = "Informacije o senzoru: " + label;
             document.getElementById('modal').style.display = 'flex';
-        }
-
-        function doScan() {
-            const list = document.getElementById('err-list');
-            list.innerHTML = '<p style="color:var(--primary); font-family:Orbitron;">SKENIRANJE...</p>';
-            setTimeout(() => {
-                list.innerHTML = '<div style="border:1px solid red; padding:15px; color:red; font-family:Orbitron;">P0420<br><span style="font-size:10px; color:#555;">Efikasnost katalizatora</span></div><p style="font-size:10px; color:#333; margin-top:10px;">TAPNI ZA BRISANJE</p>';
-                document.getElementById('page-greske').onclick = doClear;
-            }, 1500);
-        }
-
-        function doClear() {
-            const list = document.getElementById('err-list');
-            list.innerHTML = '<p style="color:var(--safe); font-family:Orbitron;">SISTEM ČIST</p>';
-            setTimeout(() => { 
-                list.innerHTML = '<p style="color:var(--primary); font-family:Orbitron; font-size:14px;">MOD ZA GREŠKE</p><p style="color:#333; font-size:12px;">TAPNI ZA SKENIRANJE</p>';
-                document.getElementById('page-greske').onclick = doScan;
-            }, 2000);
         }
         
         init();
